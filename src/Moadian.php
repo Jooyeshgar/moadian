@@ -16,15 +16,20 @@ class Moadian
     {
         $this->username = $username;
         $this->privateKey = $privateKey;
-
+        $this->client = new ApiClient();
     }
 
-    public function getFiscalInfo($documentId)
+    public function getServerInfo()
     {
-        $response = $this->client->get("fiscal/documents/{$documentId}");
+        $response = $this->client->getServerInfo();
 
-        return json_decode($response->getBody()->getContents());
+        return $response->getData();
     }
 
+    public function getFiscalInfo($fiscalId)
+    {
+        $response = $this->client->getFiscalInfo();
 
+        return $response->getData();
+    }
 }
