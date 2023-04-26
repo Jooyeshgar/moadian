@@ -1,0 +1,26 @@
+{
+    "name": "jooyeshgar/moadian",
+    "description": "Laravel package for interacting with the Moadian API of intamedia.ir",
+    "type": "library",
+    "keywords": ["laravel", "moadian", "intamedia"],
+    "homepage": "https://github.com/Jooyeshgar/moadian",
+    "license": "GPL-3.0",
+    "authors": [
+        {
+            "name": "Hadi Aminzadeh",
+            "email": "hadi60@gmail.com"
+        }
+    ],
+    "require": {
+        "php": "^7.4|^8.0",
+        "ext-openssl": "*",
+        "guzzlehttp/guzzle": "^7.0",
+        "ramsey/uuid": "^4.2",
+        "symfony/cache": "^5.3"
+    },
+    "autoload": {
+        "psr-4": {
+            "Jooyeshgar\\Moadian\\": "src/"
+        }
+    }
+}
