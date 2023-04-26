@@ -1,10 +1,10 @@
 <?php
 
-namespace Jooyeshgar\Moadian;
+namespace Jooyeshgar\Moadian\Service;
 
-use Jooyeshgar\Moadian\Packet;
 use GuzzleHttp\Client;
 use Jooyeshgar\Moadian\Exceptions\MoadianException;
+use Jooyeshgar\Moadian\Http\Packet;
 
 class ApiClient
 {
@@ -31,7 +31,7 @@ class ApiClient
         if($packet->needEncrypt) $packet = $this->encryptPacket($packet);
         
         return $this->httpClient->post($packet->getPath(), [
-            'body' => $packet->getContent(),
+            'body' => $packet->getBody(),
             'headers' => $packet->getHeaders(),
         ]);
     }
