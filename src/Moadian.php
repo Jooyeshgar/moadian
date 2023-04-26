@@ -1,5 +1,4 @@
 <?php
-
 namespace Jooyeshgar\Moadian;
 
 use GuzzleHttp\Client;

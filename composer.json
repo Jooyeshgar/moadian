@@ -20,7 +20,11 @@
     },
     "autoload": {
         "psr-4": {
-            "Jooyeshgar\\Moadian\\": "src/"
+            "Jooyeshgar\\Moadian\\": "src/",
+            "Jooyeshgar\\Moadian\\Tests\\": "test/"
         }
+    },
+    "require-dev": {
+        "phpunit/phpunit": "^10.1"
     }
 }
