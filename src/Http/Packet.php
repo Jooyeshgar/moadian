@@ -2,6 +2,7 @@
 
 namespace Jooyeshgar\Moadian\Http;
 
+
 class Packet
 {
     // Packet feild
@@ -18,7 +19,7 @@ class Packet
     // Headers feild
     public string $requestTraceId;
 
-
+    public string $path;
 
     public bool $needToken = false;
     public bool $needSign = false;
@@ -33,15 +34,19 @@ class Packet
 
     public function getHeaders()
     {
-        //
+        $headers = [
+            'requestTraceId' => $this->requestTraceId,
+            'timestamp' => time()
+        ];
+
+        if ($this->needToken) {
+            $headers['authorization'] = $this->token;
+        }
+
+        return json_encode($headers);
     }
 
     public function getBody()
-    {
-        //
-    }
-
-    public function getPath()
     {
         //
     }

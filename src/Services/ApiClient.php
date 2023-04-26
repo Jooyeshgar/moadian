@@ -4,14 +4,14 @@ namespace Jooyeshgar\Moadian\Service;
 
 use GuzzleHttp\Client;
 use Jooyeshgar\Moadian\Exceptions\MoadianException;
-use Jooyeshgar\Moadian\Http\Packet;
+use Jooyeshgar\Moadian\Http\{Packet, ServerInfoPacket, GetTokenPacket, FiscalInfoPacket};
 
 class ApiClient
 {
     private Client $httpClient;
     private $token;
 
-    public function __construct($baseUri = 'https://tp.tax.gov.ir')
+    public function __construct($baseUri = 'https://tp.tax.gov.ir/req')
     {
         $this->httpClient = new Client([
             'base_uri' => $baseUri,
@@ -30,7 +30,7 @@ class ApiClient
         if($packet->needSign) $packet = $this->signPacket($packet);
         if($packet->needEncrypt) $packet = $this->encryptPacket($packet);
         
-        return $this->httpClient->post($packet->getPath(), [
+        return $this->httpClient->post($packet->path, [
             'body' => $packet->getBody(),
             'headers' => $packet->getHeaders(),
         ]);
@@ -46,7 +46,7 @@ class ApiClient
 
     private function getToken()
     {
-        $packet = new getTokenPacket();
+        $packet = new GetTokenPacket();
         $response = $this->sendPacket($packet);
         if($response->token){
             $this->token = $response->token;
@@ -81,13 +81,13 @@ class ApiClient
 
     public function getServerInfo()
     {
-        $packet = new serverInfoPacket();
+        $packet = new ServerInfoPacket();
         return $this->sendPacket($packet);
     }
 
     public function getFiscalInfo()
     {
-        $packet = new fiscalInfoPacket();
+        $packet = new FiscalInfoPacket();
         return $this->sendPacket($packet);
     }
 }
