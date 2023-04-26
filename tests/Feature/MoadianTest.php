@@ -6,7 +6,7 @@ use GuzzleHttp\Client;
 use GuzzleHttp\Psr7\Response;
 use Jooyeshgar\Moadian\Facades\Moadian;
 use Jooyeshgar\Moadian\MoadianServiceProvider;
-use Tests\TestCase;
+use Jooyeshgar\Moadian\Tests\TestCase;
 use Mockery;
 use Ramsey\Uuid\Uuid;
 

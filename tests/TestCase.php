@@ -1,6 +1,6 @@
 <?php
 
-namespace Tests;
+namespace Jooyeshgar\Moadian\Tests;
 
 use PHPUnit\Framework\TestCase as BaseTestCase;
 

@@ -12,7 +12,7 @@
          verbose="true">
     <testsuites>
         <testsuite name="Moadian Tests">
-            <directory>./tests</directory>
+            <directory>tests</directory>
         </testsuite>
     </testsuites>
     <filter>

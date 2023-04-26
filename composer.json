@@ -21,7 +21,7 @@
     "autoload": {
         "psr-4": {
             "Jooyeshgar\\Moadian\\": "src/",
-            "Jooyeshgar\\Moadian\\Tests\\": "test/"
+            "Jooyeshgar\\Moadian\\Tests\\": "tests/"
         }
     },
     "require-dev": {
