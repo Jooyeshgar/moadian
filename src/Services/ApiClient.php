@@ -1,6 +1,6 @@
 <?php
 
-namespace Jooyeshgar\Moadian\Service;
+namespace Jooyeshgar\Moadian\Services;
 
 use GuzzleHttp\Client;
 use Jooyeshgar\Moadian\Exceptions\MoadianException;
@@ -9,14 +9,14 @@ use Jooyeshgar\Moadian\Http\{Packet, ServerInfoPacket, GetTokenPacket, FiscalInf
 class ApiClient
 {
     private Client $httpClient;
+    private SignatureService $signatureService;
     private $token;
 
-    public function __construct($baseUri = 'https://tp.tax.gov.ir/req')
+    public function __construct($username, $privateKey, $baseUri = 'https://tp.tax.gov.ir/')
     {
-        $this->httpClient = new Client([
-            'base_uri' => $baseUri,
-            'headers' => ['Content-Type' => 'application/json'],
-        ]);
+        $this->httpClient = new Client([ 'base_uri' => $baseUri ]);
+
+        $this->signatureService = new SignatureService($privateKey);
     }
     /**
      * Sends a packet to the API server.
@@ -27,9 +27,9 @@ class ApiClient
     public function sendPacket(Packet $packet)
     {
         if($packet->needToken) $packet = $this->addToken($packet);
-        if($packet->needSign) $packet = $this->signPacket($packet);
+        $packet = $this->signPacket($packet);
         if($packet->needEncrypt) $packet = $this->encryptPacket($packet);
-        
+        var_dump($packet->getBody(), $packet->getHeaders());
         return $this->httpClient->post($packet->path, [
             'body' => $packet->getBody(),
             'headers' => $packet->getHeaders(),
@@ -65,6 +65,8 @@ class ApiClient
      */
     private function signPacket(Packet $packet)
     {
+        $packet->dataSignature = $this->signatureService->sign($packet->toArray(), $packet->getHeaders());
+
         return $packet;
     }
 

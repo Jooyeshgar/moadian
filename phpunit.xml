@@ -2,28 +2,14 @@
 <phpunit colors="true"
          bootstrap="vendor/autoload.php"
          backupGlobals="false"
-         backupStaticAttributes="false"
-         convertErrorsToExceptions="true"
-         convertNoticesToExceptions="true"
-         convertWarningsToExceptions="true"
          processIsolation="false"
-         stopOnFailure="false"
-         syntaxCheck="false"
-         verbose="true">
+         stopOnFailure="false">
     <testsuites>
         <testsuite name="Moadian Tests">
             <directory>tests</directory>
         </testsuite>
     </testsuites>
-    <filter>
-        <whitelist>
-            <directory>./src</directory>
-        </whitelist>
-    </filter>
-    <logging>
-        <log type="coverage-html" target="./build/coverage" lowUpperBound="50" highLowerBound="90" />
-        <log type="coverage-clover" target="./build/logs/clover.xml" />
-        <log type="coverage-text" target="./build/logs/coverage.txt" showUncoveredFiles="true" colors="true" />
-        <log type="junit" target="./build/logs/junit.xml" />
-    </logging>
+    <php>
+        <env name="APP_ENV" value="testing"/>
+    </php>
 </phpunit>

@@ -2,24 +2,25 @@
 
 namespace Jooyeshgar\Moadian\Http;
 
+use Ramsey\Uuid\Nonstandard\Uuid;
 
 class Packet
 {
-    // Packet feild
-    public string $uid;
-    public string $packetType;
-    public bool $retry;
+    // Packet felids
+    // public ?string $uid = null;
+    public string $packetType = "GET_SERVER_INFORMATION";
+    public bool $retry = false;
     public $data;
     public string $encryptionKeyId = '';
     public string $symmetricKey = '';
     public string $iv = '';
     public string $fiscalId = '';
-    public string $dataSignature;
+    public ?string $dataSignature = null;
 
-    // Headers feild
+    // Headers felids
     public string $requestTraceId;
 
-    public string $path;
+    public string $path = 'req/api/self-tsp/sync/GET_SERVER_INFORMATION';
 
     public bool $needToken = false;
     public bool $needSign = false;
@@ -35,7 +36,8 @@ class Packet
     public function getHeaders()
     {
         $headers = [
-            'requestTraceId' => $this->requestTraceId,
+            'Content-Type' => 'application/json',
+            'requestTraceId' => $this->getTraceId(),
             'timestamp' => time()
         ];
 
@@ -43,11 +45,48 @@ class Packet
             $headers['authorization'] = $this->token;
         }
 
-        return json_encode($headers);
+        return $headers;
+    }
+
+
+    public function getPacket()
+    {
+        $data = [
+                "uid" => (string) Uuid::uuid4(),
+                "packetType" => $this->packetType,
+                "retry" => $this->retry,
+                "data" => $this->data,
+                "encryptionKeyId" => $this->encryptionKeyId,
+                "symmetricKey" => $this->symmetricKey,
+                "iv" => $this->iv,
+                "fiscalId" => $this->fiscalId,
+                "dataSignature" => $this->dataSignature
+        ];
+        return $data;
     }
 
     public function getBody()
     {
-        //
+       
+        return json_encode($this->toArray());
+    }
+
+    public function toArray()
+    {
+        $data = [
+            "time"   => 1,
+            "packet" => $this->getPacket()
+        ];
+        
+        return $data;
+    }
+
+    protected function getTraceId($new = false)
+    {
+        if ($new) {
+            return $this->requestTraceId = Uuid::uuid4()->toString();
+        }
+
+        return $this->requestTraceId ??= Uuid::uuid4()->toString();
     }
 }

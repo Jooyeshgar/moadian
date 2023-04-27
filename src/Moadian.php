@@ -2,6 +2,7 @@
 namespace Jooyeshgar\Moadian;
 
 use GuzzleHttp\Client;
+use Jooyeshgar\Moadian\Services\ApiClient;
 use Ramsey\Uuid\Uuid;
 
 class Moadian
@@ -16,7 +17,7 @@ class Moadian
     {
         $this->username = $username;
         $this->privateKey = $privateKey;
-        $this->client = new ApiClient();
+        $this->client = new ApiClient($username, $privateKey);
     }
 
     public function getServerInfo()
