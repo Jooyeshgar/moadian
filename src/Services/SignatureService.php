@@ -29,11 +29,45 @@ class SignatureService
 
     public static function normalizer(array $data, array $headers): string
     {
+        $data = $data + $headers;
 
+        $normalizedData = [];
+
+        $flatted = self::flattener($data);
+
+        ksort($flatted);
+
+        foreach ($flatted as $value) {
+            
+            strtr($value, [ '#' => '##']);
+
+            if ($value === '' || $value === null) {
+                $value = '#';
+            }
+
+            if (is_bool($value)) {
+                $value = $value ? 'true' : 'false';
+            }
+
+            $normalizedData[] = $value;
+        }
+
+        return implode("#", $normalizedData);
     }
 
     private static function flattener(array $array): array {
-
+        $flatted = [];
+        foreach ($array as $key => $value) {
+            if (is_array($value)) {
+                array_walk_recursive($value, function($nestedValue, $nestedKey) use($key, &$flatted) {
+                    $flatted["$key.$nestedKey"] = $nestedValue;
+                });
+            }
+            else {
+                $flatted[$key] = $value;
+            }
+        }
+        return $flatted;
     }
 
 }
