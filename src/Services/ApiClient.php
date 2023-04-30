@@ -14,7 +14,10 @@ class ApiClient
 
     public function __construct($username, $privateKey, $baseUri = 'https://tp.tax.gov.ir/')
     {
-        $this->httpClient = new Client([ 'base_uri' => $baseUri ]);
+        $this->httpClient = new Client([
+            'base_uri' => $baseUri,
+            'headers' => ['Content-Type' => 'application/json'],
+        ]);
 
         $this->signatureService = new SignatureService($privateKey);
     }
@@ -29,7 +32,6 @@ class ApiClient
         if($packet->needToken) $packet = $this->addToken($packet);
         $packet = $this->signPacket($packet);
         if($packet->needEncrypt) $packet = $this->encryptPacket($packet);
-        var_dump($packet->getBody(), $packet->getHeaders());
         return $this->httpClient->post($packet->path, [
             'body' => $packet->getBody(),
             'headers' => $packet->getHeaders(),
@@ -65,7 +67,7 @@ class ApiClient
      */
     private function signPacket(Packet $packet)
     {
-        $packet->dataSignature = $this->signatureService->sign($packet->toArray(), $packet->getHeaders());
+        $packet->signature = $this->signatureService->sign($packet->getPacket(), $packet->getHeaders());
 
         return $packet;
     }

@@ -28,6 +28,8 @@ class Packet
 
     private string $token;
 
+    public string $signature = "";
+
     public function setToken(string $token)
     {
         $this->token = $token;
@@ -36,9 +38,8 @@ class Packet
     public function getHeaders()
     {
         $headers = [
-            'Content-Type' => 'application/json',
             'requestTraceId' => $this->getTraceId(),
-            'timestamp' => time()
+            'timestamp' => (string)(int) floor(microtime(true) * 1000)
         ];
 
         if ($this->needToken) {
@@ -74,8 +75,8 @@ class Packet
     public function toArray()
     {
         $data = [
-            "time"   => 1,
-            "packet" => $this->getPacket()
+            "packet" => $this->getPacket(),
+            "signature" => $this->signature,
         ];
         
         return $data;

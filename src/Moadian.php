@@ -24,7 +24,7 @@ class Moadian
     {
         $response = $this->client->getServerInfo();
 
-        return $response->getData();
+        return $response;
     }
 
     public function getFiscalInfo($fiscalId)
