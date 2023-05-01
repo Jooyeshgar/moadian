@@ -13,6 +13,7 @@ class ApiClient
     private EncryptionService $encryptionService;
     private $token;
     private Response $response;
+    private $username;
 
     public function __construct($username, $privateKey, $baseUri = 'https://tp.tax.gov.ir/')
     {
@@ -20,7 +21,7 @@ class ApiClient
             'base_uri' => $baseUri,
             'headers' => ['Content-Type' => 'application/json'],
         ]);
-
+        $this->username = $username;
         $this->signatureService = new SignatureService($privateKey);
         $this->encryptionService = new EncryptionService();
         $this->response = new Response();
@@ -36,6 +37,7 @@ class ApiClient
         if($packet->needToken) $packet = $this->addToken($packet);
         $packet = $this->signPacket($packet);
         if($packet->needEncrypt) $packet = $this->encryptPacket($packet);
+
         $httpResp = $this->httpClient->post($packet->path, [
             'body' => $packet->getBody(),
             'headers' => $packet->getHeaders(),
@@ -52,12 +54,17 @@ class ApiClient
         return $packet->setToken($this->token);
     }
 
-    private function getToken()
+    public function getToken()
     {
         $packet = new GetTokenPacket();
+        $packet->fiscalId = $this->username;
+        $packet->data = ["username" => $this->username];
+
         $response = $this->sendPacket($packet);
-        if($response->token){
-            $this->token = $response->token;
+
+        if($response->isSuccessful()){
+            $result = $response->getBody();
+            $this->token = $result['token'];
             return $this->token; 
         }
 
