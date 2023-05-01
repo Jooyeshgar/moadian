@@ -10,6 +10,7 @@ class ApiClient
 {
     private Client $httpClient;
     private SignatureService $signatureService;
+    private EncryptionService $encryptionService;
     private $token;
     private Response $response;
 
@@ -21,6 +22,7 @@ class ApiClient
         ]);
 
         $this->signatureService = new SignatureService($privateKey);
+        $this->encryptionService = new EncryptionService();
         $this->response = new Response();
     }
     /**
@@ -29,7 +31,7 @@ class ApiClient
      * @param Packet $packet The packet to send.
      * @return mixed The response from the API server.
      */
-    public function sendPacket(Packet $packet)
+    public function sendPacket(Packet $packet): Response
     {
         if($packet->needToken) $packet = $this->addToken($packet);
         $packet = $this->signPacket($packet);
@@ -91,6 +93,20 @@ class ApiClient
     {
         $packet = new ServerInfoPacket();
         return $this->sendPacket($packet);
+    }
+
+    public function requirePublicKey()
+    {
+        if(empty($this->encryptionService->publicKey)){
+            $serverInfo = $this->getServerInfo();
+
+            if($serverInfo->isSuccessful()){
+                $info = $serverInfo->getBody();
+                $this->encryptionService->KeyId = $info['publicKeys'][0]['id'];
+                $pem = chunk_split($info['publicKeys'][0]['key'], 64, "\n");
+                $this->encryptionService->publicKey = "-----BEGIN PUBLIC KEY-----\n".$pem."-----END PUBLIC KEY-----\n";
+            }
+        }
     }
 
     public function getFiscalInfo()
