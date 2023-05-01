@@ -11,13 +11,13 @@ class EncryptionService
     /**
      * @var		string	$publicKey Must be get by getServerInfo
      */
-    private string $publicKey = '';
+    public string $publicKey = '';
     /**
      * @var		string	$KeyId Must be get by getServerInfo
      */
-    private string $KeyId = '';
+    public string $KeyId = '';
 
-    public function __construct($publicKey, $KeyId)
+    public function __construct($publicKey = '', $KeyId = '')
     {
         $this->publicKey = $publicKey;
         $this->KeyId = $KeyId;

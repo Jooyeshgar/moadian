@@ -15,7 +15,9 @@ class Packet
     public string $symmetricKey = '';
     public string $iv = '';
     public string $fiscalId = '';
-    public ?string $dataSignature = null;
+    public string $dataSignature = '';
+    public string $uid = '';
+    public string $timestamp = '';
 
     // Headers felids
     public string $requestTraceId;
@@ -30,6 +32,13 @@ class Packet
 
     public string $signature = "";
 
+
+    public function __construct() {
+        $this->uid = Uuid::uuid4()->toString();
+        $this->timestamp = (string)intval(microtime(true) * 1000);
+        $this->requestTraceId = Uuid::uuid4()->toString();
+    }
+
     public function setToken(string $token)
     {
         $this->token = $token;
@@ -38,8 +47,8 @@ class Packet
     public function getHeaders()
     {
         $headers = [
-            'requestTraceId' => $this->getTraceId(),
-            'timestamp' => (string)(int) floor(microtime(true) * 1000)
+            'requestTraceId' => $this->requestTraceId,
+            'timestamp' => $this->timestamp
         ];
 
         if ($this->needToken) {
@@ -53,7 +62,7 @@ class Packet
     public function getPacket()
     {
         $data = [
-                "uid" => (string) Uuid::uuid4(),
+                "uid" => $this->uid,
                 "packetType" => $this->packetType,
                 "retry" => $this->retry,
                 "data" => $this->data,
@@ -80,14 +89,5 @@ class Packet
         ];
         
         return $data;
-    }
-
-    protected function getTraceId($new = false)
-    {
-        if ($new) {
-            return $this->requestTraceId = Uuid::uuid4()->toString();
-        }
-
-        return $this->requestTraceId ??= Uuid::uuid4()->toString();
     }
 }
