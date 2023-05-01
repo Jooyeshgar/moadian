@@ -13,11 +13,11 @@ class Moadian
 
     protected $client;
 
-    public function __construct($username, $privateKey)
+    public function __construct($username, $privateKey, $baseUri ='https://tp.tax.gov.ir/')
     {
         $this->username = $username;
         $this->privateKey = $privateKey;
-        $this->client = new ApiClient($username, $privateKey);
+        $this->client = new ApiClient($username, $privateKey, $baseUri);
     }
 
     public function getServerInfo()

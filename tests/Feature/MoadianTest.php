@@ -30,11 +30,21 @@ class MoadianTest extends TestCase
 
     public function testGetServerInformation()
     {
-        var_dump(getenv('MOADIAN_USERNAME'));
-        $moadian = new Moadian(getenv('MOADIAN_USERNAME'), '');
-        $fiscalInfo = $moadian->getServerInfo();
-var_dump($fiscalInfo);
-        $this->assertEquals($documentId, $fiscalInfo->id);
+        $key = file_get_contents(__DIR__.'/private.pem');
+        $moadian = new Moadian('A11YO5', $key, 'https://Sandboxrc.tax.gov.ir/');
+    
+        $serverInfo = $moadian->getServerInfo();
+    
+        // Check if the response was successful
+        $this->assertTrue($serverInfo->isSuccessful());
+    
+        $data = $serverInfo->getBody();
+    
+        // Check if the "publicKeys" field exists in the response
+        $this->assertArrayHasKey('publicKeys', $data);
+    
+        // Check if the first "publicKeys" item has the expected "id" value
+        $this->assertEquals($data['publicKeys'][0]['id'], '6a2bcd88-a871-4245-a393-2843eafe6e02');
     }
 
     // public function testGetServerInformation()

@@ -4,13 +4,14 @@ namespace Jooyeshgar\Moadian\Services;
 
 use GuzzleHttp\Client;
 use Jooyeshgar\Moadian\Exceptions\MoadianException;
-use Jooyeshgar\Moadian\Http\{Packet, ServerInfoPacket, GetTokenPacket, FiscalInfoPacket};
+use Jooyeshgar\Moadian\Http\{Packet, ServerInfoPacket, GetTokenPacket, FiscalInfoPacket, Response};
 
 class ApiClient
 {
     private Client $httpClient;
     private SignatureService $signatureService;
     private $token;
+    private Response $response;
 
     public function __construct($username, $privateKey, $baseUri = 'https://tp.tax.gov.ir/')
     {
@@ -20,6 +21,7 @@ class ApiClient
         ]);
 
         $this->signatureService = new SignatureService($privateKey);
+        $this->response = new Response();
     }
     /**
      * Sends a packet to the API server.
@@ -32,10 +34,12 @@ class ApiClient
         if($packet->needToken) $packet = $this->addToken($packet);
         $packet = $this->signPacket($packet);
         if($packet->needEncrypt) $packet = $this->encryptPacket($packet);
-        return $this->httpClient->post($packet->path, [
+        $httpResp = $this->httpClient->post($packet->path, [
             'body' => $packet->getBody(),
             'headers' => $packet->getHeaders(),
         ]);
+
+        return $this->response->setResponse($httpResp);
     }
 
     private function addToken(Packet $packet)
