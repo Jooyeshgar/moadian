@@ -38,15 +38,16 @@ class SignatureService
         ksort($flatted);
 
         foreach ($flatted as $value) {
-            
-            strtr($value, [ '#' => '##']);
+
+            if (is_bool($value)) {
+                $value = $value ? 'true' : 'false';
+            }
 
             if ($value === '' || $value === null) {
                 $value = '#';
             }
-
-            if (is_bool($value)) {
-                $value = $value ? 'true' : 'false';
+            else {
+                strtr($value, [ '#' => '##']);
             }
 
             $normalizedData[] = $value;
@@ -55,19 +56,16 @@ class SignatureService
         return implode("#", $normalizedData);
     }
 
-    private static function flattener(array $array): array {
+    private static function flattener(array $array, string $prefix = ''): array {
         $flatted = [];
         foreach ($array as $key => $value) {
             if (is_array($value)) {
-                array_walk_recursive($value, function($nestedValue, $nestedKey) use($key, &$flatted) {
-                    $flatted["$key.$nestedKey"] = $nestedValue;
-                });
+                $flatted = array_merge($flatted, self::flattener($value, "$prefix.$key"));
             }
             else {
-                $flatted[$key] = $value;
+                $flatted["$prefix.$key"] = $value;
             }
         }
         return $flatted;
     }
-
 }
