@@ -56,4 +56,18 @@ class MoadianTest extends TestCase
 
         $this->assertIsString($res);
     }
+
+    public function testInquiryByUid()
+    {
+        $key = file_get_contents(__DIR__ . '/private.pem');
+        $moadian = new Moadian('A11YO5', $key);
+
+        $res = $moadian->inquiryByUid([
+            Uuid::uuid4()->toString(),
+            Uuid::uuid4()->toString()
+        ]);
+
+        $this->assertEquals('NOT_FOUND', $res->getBody()[0]['status']);
+        $this->assertEquals('NOT_FOUND', $res->getBody()[1]['status']);
+    }
 }

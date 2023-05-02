@@ -52,7 +52,7 @@ class Packet
         ];
 
         if ($this->needToken) {
-            $headers['authorization'] = $this->token;
+            $headers['authorization'] = 'Bearer ' . $this->token;
         }
 
         return $headers;

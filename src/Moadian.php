@@ -38,4 +38,10 @@ class Moadian
 
         return $response->getData();
     }
+
+    public function inquiryByUid(array $uids)
+    {
+        $response = $this->client->inquiryByUid($uids);
+        return $response;
+    }
 }
