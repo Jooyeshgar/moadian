@@ -32,11 +32,11 @@ class Moadian
         return $response;
     }
 
-    public function getFiscalInfo($fiscalId)
+    public function getFiscalInfo()
     {
         $response = $this->client->getFiscalInfo();
 
-        return $response->getData();
+        return $response;
     }
 
     public function inquiryByUid(array $uids)

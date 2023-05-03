@@ -123,7 +123,7 @@ class ApiClient
 
     public function getFiscalInfo()
     {
-        $packet = new FiscalInfoPacket();
+        $packet = new FiscalInfoPacket($this->username);
         return $this->sendPacket($packet);
     }
 

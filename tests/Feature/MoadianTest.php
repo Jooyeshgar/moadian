@@ -84,4 +84,15 @@ class MoadianTest extends TestCase
         $this->assertEquals('NOT_FOUND', $res->getBody()[0]['status']);
         $this->assertEquals('NOT_FOUND', $res->getBody()[0]['status']);
     }
+
+    public function testGetFiscalInformation()
+    {
+        $key = file_get_contents(__DIR__ . '/private.pem');
+        $moadian = new Moadian('A11YO5', $key);
+
+        $res = $moadian->getFiscalInfo();
+
+        $this->assertEquals(200, $res->getStatusCode());
+        $this->assertArrayHasKey('economicCode', $res->getBody());
+    }
 }
