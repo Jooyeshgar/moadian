@@ -4,7 +4,7 @@ namespace Jooyeshgar\Moadian\Services;
 
 use GuzzleHttp\Client;
 use Jooyeshgar\Moadian\Exceptions\MoadianException;
-use Jooyeshgar\Moadian\Http\{Packet, ServerInfoPacket, GetTokenPacket, FiscalInfoPacket, Response};
+use Jooyeshgar\Moadian\Http\{Packet, ServerInfoPacket, GetTokenPacket, FiscalInfoPacket, InquiryByReferenceNumber, InquiryByUid, Response};
 
 class ApiClient
 {
@@ -34,7 +34,7 @@ class ApiClient
      */
     public function sendPacket(Packet $packet): Response
     {
-        if($packet->needToken) $packet = $this->addToken($packet);
+        if($packet->needToken) $this->addToken($packet);
         $packet = $this->signPacket($packet);
         if($packet->needEncrypt) $packet = $this->encryptPacket($packet);
 
@@ -48,7 +48,7 @@ class ApiClient
 
     private function addToken(Packet $packet)
     {
-        if(!is_null($this->token)){
+        if(is_null($this->token)){
             $this->getToken();
         }
         return $packet->setToken($this->token);
@@ -80,7 +80,12 @@ class ApiClient
      */
     private function signPacket(Packet $packet)
     {
-        $packet->signature = $this->signatureService->sign($packet->getPacket(), $packet->getHeaders());
+        $headers = $packet->getHeaders();
+        if (isset($headers['authorization'])) {
+            $headers['authorization'] = str_replace('Bearer ', '', $headers['authorization']);
+        }
+
+        $packet->signature = $this->signatureService->sign($packet->getPacket(), $headers);
 
         return $packet;
     }
@@ -119,6 +124,28 @@ class ApiClient
     public function getFiscalInfo()
     {
         $packet = new FiscalInfoPacket();
+        return $this->sendPacket($packet);
+    }
+
+    public function inquiryByUid(array $uids)
+    {
+        $packet = new InquiryByUid();
+        foreach ($uids as $uid) {
+            $packet->data[] = [
+                'uid' => $uid,
+                'fiscalId' => $this->username,
+            ];
+        }
+        return $this->sendPacket($packet);
+    }
+
+    public function inquiryByReferenceNumber(array $refNums)
+    {
+        $packet = new InquiryByReferenceNumber($this->username);
+        $packet->data = [
+            'referenceNumber' => $refNums,
+        ];
+
         return $this->sendPacket($packet);
     }
 }
