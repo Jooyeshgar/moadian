@@ -8,6 +8,6 @@ class Moadian extends Facade
 {
     protected static function getFacadeAccessor()
     {
-        return 'moadian';
+        return 'Jooyeshgar\Moadian\Moadian';
     }
 }
