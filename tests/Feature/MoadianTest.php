@@ -70,4 +70,18 @@ class MoadianTest extends TestCase
         $this->assertEquals('NOT_FOUND', $res->getBody()[0]['status']);
         $this->assertEquals('NOT_FOUND', $res->getBody()[1]['status']);
     }
+
+    public function testInquiryByReferenceNumber()
+    {
+        $key = file_get_contents(__DIR__ . '/private.pem');
+        $moadian = new Moadian('A11YO5', $key);
+
+        $res = $moadian->inquiryByReferenceNumber([
+            Uuid::uuid4()->toString(),
+            Uuid::uuid4()->toString()
+        ]);
+
+        $this->assertEquals('NOT_FOUND', $res->getBody()[0]['status']);
+        $this->assertEquals('NOT_FOUND', $res->getBody()[0]['status']);
+    }
 }

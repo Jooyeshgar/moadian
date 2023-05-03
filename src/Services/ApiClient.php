@@ -4,7 +4,7 @@ namespace Jooyeshgar\Moadian\Services;
 
 use GuzzleHttp\Client;
 use Jooyeshgar\Moadian\Exceptions\MoadianException;
-use Jooyeshgar\Moadian\Http\{Packet, ServerInfoPacket, GetTokenPacket, FiscalInfoPacket, InquiryByUid, Response};
+use Jooyeshgar\Moadian\Http\{Packet, ServerInfoPacket, GetTokenPacket, FiscalInfoPacket, InquiryByReferenceNumber, InquiryByUid, Response};
 
 class ApiClient
 {
@@ -136,6 +136,16 @@ class ApiClient
                 'fiscalId' => $this->username,
             ];
         }
+        return $this->sendPacket($packet);
+    }
+
+    public function inquiryByReferenceNumber(array $refNums)
+    {
+        $packet = new InquiryByReferenceNumber($this->username);
+        $packet->data = [
+            'referenceNumber' => $refNums,
+        ];
+
         return $this->sendPacket($packet);
     }
 }

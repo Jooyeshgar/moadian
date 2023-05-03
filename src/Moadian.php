@@ -44,4 +44,10 @@ class Moadian
         $response = $this->client->inquiryByUid($uids);
         return $response;
     }
+
+    public function inquiryByReferenceNumber(array $refNums)
+    {
+        $response = $this->client->inquiryByReferenceNumber($refNums);
+        return $response;
+    }
 }
