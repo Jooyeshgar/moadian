@@ -13,11 +13,15 @@ class MoadianServiceProvider extends ServiceProvider
      */
     public function register()
     {
-        $this->mergeConfigFrom(__DIR__.'/../config/moadian.php', 'services.moadian');
-        $this->app->bind('Jooyeshgar\Moadian\Moadian', function ($app) {
-            $config = $app['config']['services.moadian'];
+        $this->mergeConfigFrom(
+            __DIR__.'/config/moadian.php', 'moadian'
+        );
 
-            $privateKeyPath = $config['private_key_path'] ?? storage_path('app/keys/private.key');
+        $this->app->bind('Jooyeshgar\Moadian\Moadian', function ($app) {
+
+            $config = $app['config']['moadian'];
+
+            $privateKeyPath = $config['private_key_path'] ?? storage_path('app/keys/private.pem');
             $privateKey = file_get_contents($privateKeyPath);
 
             return new Moadian(
@@ -35,9 +39,7 @@ class MoadianServiceProvider extends ServiceProvider
     public function boot()
     {
         $this->publishes([
-            __DIR__.'/../config/moadian.php' => config_path('services/moadian.php'),
+            __DIR__.'/config/moadian.php' => config_path('moadian.php'),
         ], 'config');
-
-        $this->mergeConfigFrom(__DIR__.'/../config/moadian.php', 'services.moadian');
     }
 }
