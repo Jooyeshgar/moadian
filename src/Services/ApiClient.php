@@ -4,13 +4,14 @@ namespace Jooyeshgar\Moadian\Services;
 
 use GuzzleHttp\Client;
 use Jooyeshgar\Moadian\Exceptions\MoadianException;
-use Jooyeshgar\Moadian\Http\{EconomicCodeInformation, Packet, ServerInfoPacket, GetTokenPacket, FiscalInfoPacket, InquiryByReferenceNumber, InquiryByUid, Response};
+use Jooyeshgar\Moadian\Http\{EconomicCodeInformation, Packet, ServerInfoPacket, GetTokenPacket, FiscalInfoPacket, InquiryByReferenceNumber, InquiryByUid, invoicePacket, Response};
+use Jooyeshgar\Moadian\Invoice;
 
 class ApiClient
 {
     private Client $httpClient;
-    private SignatureService $signatureService;
-    private EncryptionService $encryptionService;
+    private SignatureService $signer;
+    private EncryptionService $encryptor;
     private $token;
     private Response $response;
     private $username;
@@ -22,8 +23,8 @@ class ApiClient
             'headers' => ['Content-Type' => 'application/json'],
         ]);
         $this->username = $username;
-        $this->signatureService = new SignatureService($privateKey);
-        $this->encryptionService = new EncryptionService();
+        $this->signer = new SignatureService($privateKey);
+        $this->encryptor = new EncryptionService();
         $this->response = new Response();
     }
     /**
@@ -85,7 +86,7 @@ class ApiClient
             $headers['authorization'] = str_replace('Bearer ', '', $headers['authorization']);
         }
 
-        $packet->signature = $this->signatureService->sign($packet->getPacket(), $headers);
+        $packet->signature = $this->signer->sign($packet->getPacket(), $headers);
 
         return $packet;
     }
@@ -98,6 +99,16 @@ class ApiClient
      */
     private function encryptPacket(Packet $packet)
     {
+        $this->requirePublicKey();
+
+        $aesHex = bin2hex(random_bytes(32));
+        $iv = bin2hex(random_bytes(16));
+        
+        $packet->iv = $iv;
+        $packet->symmetricKey = $this->encryptor->encryptAesKey($aesHex);
+        $packet->encryptionKeyId = $this->encryptor->KeyId;
+        $packet->data = $this->encryptor->encrypt(json_encode($packet->data), hex2bin($aesHex), hex2bin($iv));
+
         return $packet;
     }
 
@@ -109,14 +120,14 @@ class ApiClient
 
     public function requirePublicKey()
     {
-        if(empty($this->encryptionService->publicKey)){
+        if(empty($this->encryptor->publicKey)){
             $serverInfo = $this->getServerInfo();
 
             if($serverInfo->isSuccessful()){
                 $info = $serverInfo->getBody();
-                $this->encryptionService->KeyId = $info['publicKeys'][0]['id'];
+                $this->encryptor->KeyId = $info['publicKeys'][0]['id'];
                 $pem = chunk_split($info['publicKeys'][0]['key'], 64, "\n");
-                $this->encryptionService->publicKey = "-----BEGIN PUBLIC KEY-----\n".$pem."-----END PUBLIC KEY-----\n";
+                $this->encryptor->publicKey = "-----BEGIN PUBLIC KEY-----\n".$pem."-----END PUBLIC KEY-----\n";
             }
         }
     }
@@ -155,6 +166,14 @@ class ApiClient
         $packet->data = [
             'economicCode' => $taxID,
         ];
+
+        return $this->sendPacket($packet);
+    }
+
+    public function sendInvoice(Invoice $moadianInvoice)
+    {
+        $packet = new invoicePacket();
+        $packet->data = $moadianInvoice->toArray();
 
         return $this->sendPacket($packet);
     }

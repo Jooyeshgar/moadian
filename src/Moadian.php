@@ -59,4 +59,8 @@ class Moadian
 
         return $this->client->getEconomicCodeInformation($taxID);
     }
+
+    public function sendInvoice(Invoice $moadianInvoice){
+        return $this->client->sendInvoice($moadianInvoice);
+    }
 }

@@ -13,12 +13,12 @@ class Invoice
         $this->header = $header;
     }
 
-    public function addItem(InvoiceItem $item)
+    public function addItem(array $item)
     {
         $this->body[] = $item;
     }
 
-    public function addPayment(Payment $payment)
+    public function addPayment(array $payment)
     {
         $this->payment[] = $payment;
     }

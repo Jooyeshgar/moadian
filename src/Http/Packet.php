@@ -61,7 +61,7 @@ class Packet
 
     public function getPacket()
     {
-        $data = [
+        return [
                 "uid" => $this->uid,
                 "packetType" => $this->packetType,
                 "retry" => $this->retry,
@@ -72,7 +72,6 @@ class Packet
                 "fiscalId" => $this->fiscalId,
                 "dataSignature" => $this->dataSignature
         ];
-        return $data;
     }
 
     public function getBody()

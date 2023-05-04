@@ -16,7 +16,8 @@
         "ext-openssl": "*",
         "guzzlehttp/guzzle": "^7.0",
         "ramsey/uuid": "^4.2",
-        "symfony/cache": "^5.3|^6.0"
+        "symfony/cache": "^5.3|^6.0",
+        "phpseclib/phpseclib": "^3.0"
     },
     "autoload": {
         "psr-4": {
