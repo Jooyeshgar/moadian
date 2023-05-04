@@ -2,10 +2,18 @@
 
 namespace Jooyeshgar\Moadian;
 
+use DateTime;
+use Jooyeshgar\Moadian\Services\VerhoeffService;
+
 class InvoiceHeader
 {
     /**
-     * unique tax ID (should be generated using InvoiceIdService)
+     * MOADIAN_USERNAME
+     */
+    public string $clientId;
+
+    /**
+     * unique tax ID (should be set by setTaxID )
      */
     public string $taxid;
 
@@ -164,8 +172,55 @@ class InvoiceHeader
      */
     public int $tax17;
 
+    public function __construct(string $username = null) {
+        $this->clientId = $username;
+    }
+
     public function toArray(): array
     {
         return get_object_vars($this);
+    }
+
+    public function setTaxID(DateTime $date, int $internalInvoiceId): string
+    {
+        $daysPastEpoch = $this->getDaysPastEpoch($date);
+        $daysPastEpochPadded = str_pad($daysPastEpoch, 6, '0', STR_PAD_LEFT);
+        $hexDaysPastEpochPadded = str_pad(dechex($daysPastEpoch), 5, '0', STR_PAD_LEFT);
+
+        $numericClientId = $this->clientIdToNumber($this->clientId);
+
+        $internalInvoiceIdPadded = str_pad($internalInvoiceId, 12, '0', STR_PAD_LEFT);
+        $hexInternalInvoiceIdPadded = str_pad(dechex($internalInvoiceId), 10, '0', STR_PAD_LEFT);
+
+        $decimalInvoiceId = $numericClientId . $daysPastEpochPadded . $internalInvoiceIdPadded;
+
+        $checksum = VerhoeffService::checkSum($decimalInvoiceId);
+
+        $this->taxid = strtoupper($this->clientId . $hexDaysPastEpochPadded . $hexInternalInvoiceIdPadded . $checksum);
+    }
+
+    private function getDaysPastEpoch(DateTime $date): int
+    {
+        return (int)($date->getTimestamp() / (3600 * 24));
+    }
+
+    private function clientIdToNumber(string $clientId): string
+    {
+        define('CHARACTER_TO_NUMBER_CODING', [
+            'A' => 65, 'B' => 66, 'C' => 67, 'D' => 68, 'E' => 69, 'F' => 70, 'G' => 71, 'H' => 72, 'I' => 73,
+            'J' => 74, 'K' => 75, 'L' => 76, 'M' => 77, 'N' => 78, 'O' => 79, 'P' => 80, 'Q' => 81, 'R' => 82,
+            'S' => 83, 'T' => 84, 'U' => 85, 'V' => 86, 'W' => 87, 'X' => 88, 'Y' => 89, 'Z' => 90,
+        ]);
+    
+        $result = '';
+        foreach (str_split($clientId) as $char) {
+            if (is_numeric($char)) {
+                $result .= $char;
+            } else {
+                $result .= CHARACTER_TO_NUMBER_CODING[$char];
+            }
+        }
+    
+        return $result;
     }
 }
