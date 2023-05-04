@@ -40,7 +40,7 @@ class Response
 
     public function isSuccessful()
     {
-        return $this->statusCode >= 200 && $this->statusCode < 300;
+        return is_null($this->error) && $this->statusCode >= 200 && $this->statusCode < 300;
     }
 
     private function parseJson($json)
@@ -49,8 +49,9 @@ class Response
 
         if (json_last_error() !== JSON_ERROR_NONE) {
             // Handle JSON parsing error
+            $this->error = 'Failed to parse response as JSON';
             return [
-                'error' => 'Failed to parse response as JSON',
+                'error' => $this->error,
                 'raw' => $json,
             ];
         }
@@ -58,8 +59,9 @@ class Response
             return $data['result']['data'];
         }
 
+        $this->error = 'Response does not contain a "result.data" field';
         return [
-            'error' => 'Response does not contain a "result.data" field',
+            'error' => $this->error,
             'raw' => $data,
         ];
     }

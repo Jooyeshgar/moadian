@@ -2,6 +2,7 @@
 namespace Jooyeshgar\Moadian;
 
 use GuzzleHttp\Client;
+use Jooyeshgar\Moadian\Exceptions\MoadianException;
 use Jooyeshgar\Moadian\Services\ApiClient;
 use Ramsey\Uuid\Uuid;
 
@@ -45,9 +46,17 @@ class Moadian
         return $response;
     }
 
-    public function inquiryByReferenceNumber(array $refNums)
+    public function inquiryByReferenceNumbers(array $refNums)
     {
-        $response = $this->client->inquiryByReferenceNumber($refNums);
+        $response = $this->client->inquiryByReferenceNumbers($refNums);
         return $response;
+    }
+
+    public function getEconomicCodeInformation(string $taxID)
+    {
+        if (strlen($taxID)>9 || strlen($taxID) < 12)
+            throw new MoadianException('$taxID must be between 10 and 11 digits');
+
+        return $this->client->getEconomicCodeInformation($taxID);
     }
 }
