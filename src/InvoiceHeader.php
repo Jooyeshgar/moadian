@@ -181,7 +181,7 @@ class InvoiceHeader
         return get_object_vars($this);
     }
 
-    public function setTaxID(DateTime $date, int $internalInvoiceId): string
+    public function setTaxID(DateTime $date, int $internalInvoiceId)
     {
         $daysPastEpoch = $this->getDaysPastEpoch($date);
         $daysPastEpochPadded = str_pad($daysPastEpoch, 6, '0', STR_PAD_LEFT);

@@ -36,9 +36,17 @@ class ApiClient
     public function sendPacket(Packet $packet): Response
     {
         if($packet->needToken) $this->addToken($packet);
-        $packet = $this->signPacket($packet);
         if($packet->needEncrypt) $packet = $this->encryptPacket($packet);
-
+        if($packet->packetType === 'INVOICE.V01') {
+            $headers = $packet->getHeaders();
+            if (isset($headers['authorization'])) {
+                $headers['authorization'] = str_replace('Bearer ', '', $headers['authorization']);
+            }
+            $packet->signature = $this->signer->sign(['packets' => [$packet->getPacket()]], $headers);
+        } else {
+            $packet = $this->signPacket($packet);
+        }
+        
         $httpResp = $this->httpClient->post($packet->path, [
             'body' => $packet->getBody(),
             'headers' => $packet->getHeaders(),
@@ -172,8 +180,9 @@ class ApiClient
 
     public function sendInvoice(Invoice $moadianInvoice)
     {
-        $packet = new invoicePacket();
+        $packet = new invoicePacket($this->username);
         $packet->data = $moadianInvoice->toArray();
+        $packet->dataSignature = $this->signer->sign($moadianInvoice->toArray(), []);
 
         return $this->sendPacket($packet);
     }

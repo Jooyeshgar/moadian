@@ -2,6 +2,7 @@
 
 namespace Jooyeshgar\Moadian\Tests\Feature;
 
+use DateTime;
 use GuzzleHttp\Client;
 use GuzzleHttp\Psr7\Response;
 use Jooyeshgar\Moadian\Moadian;
@@ -10,6 +11,10 @@ use Jooyeshgar\Moadian\Tests\TestCase;
 use Mockery;
 use Ramsey\Uuid\Uuid;
 use Illuminate\Contracts\Foundation\Application;
+use Jooyeshgar\Moadian\Invoice;
+use Jooyeshgar\Moadian\InvoiceHeader;
+use Jooyeshgar\Moadian\InvoiceItem;
+use Jooyeshgar\Moadian\Payment;
 
 class MoadianTest extends TestCase
 {
@@ -76,7 +81,7 @@ class MoadianTest extends TestCase
         $key = file_get_contents(__DIR__ . '/private.pem');
         $moadian = new Moadian('A11YO5', $key);
 
-        $res = $moadian->inquiryByReferenceNumber([
+        $res = $moadian->inquiryByReferenceNumbers([
             Uuid::uuid4()->toString(),
             Uuid::uuid4()->toString()
         ]);
