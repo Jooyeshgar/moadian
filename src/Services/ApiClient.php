@@ -4,7 +4,7 @@ namespace Jooyeshgar\Moadian\Services;
 
 use GuzzleHttp\Client;
 use Jooyeshgar\Moadian\Exceptions\MoadianException;
-use Jooyeshgar\Moadian\Http\{EconomicCodeInformation, Packet, ServerInfoPacket, GetTokenPacket, FiscalInfoPacket, InquiryByReferenceNumber, InquiryByUid, invoicePacket, Response};
+use Jooyeshgar\Moadian\Http\{EconomicCodeInformation, Packet, ServerInfoPacket, GetTokenPacket, FiscalInfoPacket, InquiryByReferenceNumber, InquiryByUid, invoicePacket, Request, Response};
 use Jooyeshgar\Moadian\Invoice;
 
 class ApiClient
@@ -33,43 +33,34 @@ class ApiClient
      * @param Packet $packet The packet to send.
      * @return mixed The response from the API server.
      */
-    public function sendPacket(Packet $packet): Response
+    public function sendRequest(Request $request): Response
     {
-        if($packet->needToken) $this->addToken($packet);
-        if($packet->needEncrypt) $packet = $this->encryptPacket($packet);
-        if($packet->packetType === 'INVOICE.V01') {
-            $headers = $packet->getHeaders();
-            if (isset($headers['authorization'])) {
-                $headers['authorization'] = str_replace('Bearer ', '', $headers['authorization']);
-            }
-            $packet->signature = $this->signer->sign(['packets' => [$packet->getPacket()]], $headers);
-        } else {
-            $packet = $this->signPacket($packet);
-        }
-        
-        $httpResp = $this->httpClient->post($packet->path, [
-            'body' => $packet->getBody(),
-            'headers' => $packet->getHeaders(),
+        if($request->needToken) $this->addToken($request);
+        if($request->getPacket()->needEncrypt) $this->encryptPacket($request->getPacket());
+        $request = $this->signRequest($request);
+
+        $httpResp = $this->httpClient->post($request->getPacket()->path, [
+            'body' => $request->getBody(),
+            'headers' => $request->getHeaders(),
         ]);
 
         return $this->response->setResponse($httpResp);
     }
 
-    private function addToken(Packet $packet)
+    private function addToken(Request $request)
     {
         if(is_null($this->token)){
             $this->getToken();
         }
-        return $packet->setToken($this->token);
+        return $request->setToken($this->token);
     }
 
     public function getToken()
     {
-        $packet = new GetTokenPacket();
-        $packet->fiscalId = $this->username;
-        $packet->data = ["username" => $this->username];
+        $request = new Request();
+        $request->setPacket(new GetTokenPacket($this->username));
 
-        $response = $this->sendPacket($packet);
+        $response = $this->sendRequest($request);
 
         if($response->isSuccessful()){
             $result = $response->getBody();
@@ -87,16 +78,20 @@ class ApiClient
      * @param Packet $packet The packet to sign.
      * @return void
      */
-    private function signPacket(Packet $packet)
+    private function signRequest(Request $request)
     {
-        $headers = $packet->getHeaders();
+        $headers = $request->getHeaders();
         if (isset($headers['authorization'])) {
             $headers['authorization'] = str_replace('Bearer ', '', $headers['authorization']);
         }
 
-        $packet->signature = $this->signer->sign($packet->getPacket(), $headers);
+        if ($request->getPackets() !== []) {
+            $request->signature = $this->signer->sign(['packets' => [$request->getPacket()->toArray()]], $headers);
+        } else {
+            $request->signature = $this->signer->sign($request->getPacket()->toArray(), $headers);
+        }
 
-        return $packet;
+        return $request;
     }
 
     /**
@@ -122,8 +117,9 @@ class ApiClient
 
     public function getServerInfo()
     {
-        $packet = new ServerInfoPacket();
-        return $this->sendPacket($packet);
+        $request = new Request();
+        $request->setPacket(new ServerInfoPacket());
+        return $this->sendRequest($request);
     }
 
     public function requirePublicKey()
@@ -142,48 +138,41 @@ class ApiClient
 
     public function getFiscalInfo()
     {
-        $packet = new FiscalInfoPacket($this->username);
-        return $this->sendPacket($packet);
+        $request = new Request();
+        $request->setPacket(new FiscalInfoPacket($this->username));
+        return $this->sendRequest($request);
     }
 
     public function inquiryByUid(array $uids)
     {
-        $packet = new InquiryByUid();
-        foreach ($uids as $uid) {
-            $packet->data[] = [
-                'uid' => $uid,
-                'fiscalId' => $this->username,
-            ];
-        }
-        return $this->sendPacket($packet);
+        $request = new Request();
+        $request->setPacket(new InquiryByUid($uids, $this->username));
+        return $this->sendRequest($request);
     }
 
     public function inquiryByReferenceNumbers(array $refNums)
     {
-        $packet = new InquiryByReferenceNumber($this->username);
-        $packet->data = [
-            'referenceNumber' => $refNums,
-        ];
+        $request = new Request();
+        $request->setPacket(new InquiryByReferenceNumber($refNums, $this->username));
 
-        return $this->sendPacket($packet);
+        return $this->sendRequest($request);
     }
 
-    public function getEconomicCodeInformation(string $taxID)
+    public function getEconomicCodeInformation(string $taxId)
     {
-        $packet = new EconomicCodeInformation($this->username);
-        $packet->data = [
-            'economicCode' => $taxID,
-        ];
+        $request = new Request();
+        $request->setPacket(new EconomicCodeInformation($taxId));
 
-        return $this->sendPacket($packet);
+        return $this->sendRequest($request);
     }
 
     public function sendInvoice(Invoice $moadianInvoice)
     {
-        $packet = new invoicePacket($this->username);
-        $packet->data = $moadianInvoice->toArray();
+        $request = new Request();
+        $packet = new invoicePacket($this->username, $moadianInvoice);
         $packet->dataSignature = $this->signer->sign($moadianInvoice->toArray(), []);
+        $request->setPackets([$packet]);
 
-        return $this->sendPacket($packet);
+        return $this->sendRequest($request);
     }
 }

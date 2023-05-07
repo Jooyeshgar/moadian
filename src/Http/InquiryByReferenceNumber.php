@@ -4,7 +4,7 @@ namespace Jooyeshgar\Moadian\Http;
 
 class InquiryByReferenceNumber extends Packet
 {
-    public function __construct(string $username)
+    public function __construct(array $refNums, string $username)
     {
         parent::__construct();
 
@@ -12,5 +12,9 @@ class InquiryByReferenceNumber extends Packet
         $this->packetType = 'INQUIRY_BY_REFERENCE_NUMBER';
         $this->fiscalId   = $username;
         $this->needToken  = true;
+
+        $this->data = [
+            'referenceNumber' => $refNums,
+        ];
     }
 }
