@@ -21,7 +21,7 @@ class Response
         }
 
         return $this;
-    }
+    }   
 
     public function getStatusCode()
     {
@@ -55,8 +55,22 @@ class Response
                 'raw' => $json,
             ];
         }
+
+        if (!$this->isSuccessful()) {
+            return [
+                'error' => $data['errors'][0]['errorDetail'],
+                'errorCode' => $data['errors'][0]['errorCode']
+            ];
+        }
+
+        //sync response
         if(isset($data['result']['data'])){
             return $data['result']['data'];
+        }
+        
+        //async response
+        if(isset($data['result'][0]['referenceNumber'])) {
+            return $data['result'];
         }
 
         $this->error = 'Response does not contain a "result.data" field';
