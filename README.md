@@ -1,7 +1,5 @@
 # Laravel Moadian API Driver
 
-> NOTE: This package is currently under development and is not ready for production use.
-
 This Laravel package provides a convenient way to interact with the API of the "Moadian system" (سامانه مودیان) offered by intamedia.ir. With this package, you can easily make requests to the Moadian API and handle the responses in your Laravel application.
 
 ## Requirements
