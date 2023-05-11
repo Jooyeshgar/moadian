@@ -20,6 +20,9 @@ To use this package, you will need to obtain a username and private key from int
 MOADIAN_USERNAME=your-username-here
 MOADIAN_PRIVATE_KEY_PATH=/path/to/private.key
 ```
+The default location to store the private key is:
+storage_path('app/keys/private.pem');
+
 You can then use the `Moadian` facade to interact with the Moadian API. Here are some examples:
 
 ```php
@@ -41,7 +44,96 @@ $info = Moadian::getEconomicCodeInformation('10840096498');
 $info = Moadian::inquiryByReferenceNumbers(["a45aa663-6888-4025-a89d-86fc789672a0"]);
 ```
 
-For more information on how to use this package, please refer to the official documentation.
+### Send Invoice
+
+To send an invoice to Moadian, you can use the sendInvoice() method provided by the plugin. Here's an example of how to use it:
+
+```php
+use Jooyeshgar\Moadian\Invoice as MoadianInvoice;
+use Jooyeshgar\Moadian\InvoiceHeader;
+use Jooyeshgar\Moadian\InvoiceItem;
+use Jooyeshgar\Moadian\Payment;
+
+public function sendInvoice($invoiceId = '') {
+    $invoiceId = intval($invoiceId);
+    $invoice = Invoice::find($invoiceId);
+
+    if (!$invoice) {
+        throw new Exception('Invoice not found');
+    }
+
+    $timestamp = Carbon::parse($invoice->date)->timestamp * 1000;
+
+    $Header = new InvoiceHeader(env('MOADIAN_USERNAME'));
+    $Header->setTaxID(Carbon::parse($invoice->date), $invoice->number);
+    $Header->indati2m = $timestamp;
+    $Header->indatim = $timestamp;
+    $Header->inty = 1; //invoice type
+    $Header->inno = $invoiceId;
+    $Header->irtaxid = null; // invoice reference tax ID
+    $Header->inp = $invoice->inp; //invoice pattern
+    $Header->ins = 1;
+    $Header->tins = env('TAXID');
+    $Header->tob = 2;
+    $Header->bid = $invoice->nationalnum;
+    $Header->tinb = $invoice->nationalnum;
+    $Header->bpc = $invoice->postal;
+
+    $amount   = $invoice->items->sum('amount');
+    $discount = $invoice->items->sum('discount');
+    $vat      = $invoice->items->sum('vat');
+    $Header->tprdis = $amount;
+    $Header->tdis = $discount;
+    $Header->tadis = $amount - $discount;
+    $Header->tvam = $vat;
+    $Header->tbill = $amount - $discount + $vat;
+    $Header->setm = $invoice->setm;
+    $Header->cap = $amount - $discount + $vat;
+
+    $moadianInvoice = new MoadianInvoice($Header);
+
+    foreach ($invoice->items as $item) {
+        $Body = new InvoiceItem();
+        $Body->sstid = $item->seals->sstid;
+        $Body->sstt = $item->desc;
+        $Body->am = '1';
+        $Body->mu = 1627;
+        $Body->fee = $item->amount;
+        $Body->prdis = $item->amount;
+        $Body->dis = $item->discount;
+        $Body->adis = $item->amount - $item->discount;
+        $Body->vra = '0.09';
+        $Body->vam = $item->vat;
+        $Body->tsstam = $item->amount - $item->discount + $item->vat;
+        $moadianInvoice->addItem($Body);
+    }
+
+    foreach ($invoice->cashes as $cashe) {
+        if ($cashe->active == 1) {
+            $Payment = new Payment();
+            $Payment->trn = $cashe->code;
+            $Payment->pdt = Carbon::parse($cashe->date)->timestamp * 1000;
+            $moadianInvoice->addPayment($Payment);
+        }
+    }
+
+    $info = Moadian::sendInvoice($moadianInvoice);
+    $info = $info->getBody();
+    $info = $info[0];
+
+    $invoice->taxID           = $Header->taxid;
+    $invoice->uid             = $info['uid'] ?? '';
+    $invoice->referenceNumber = $info['referenceNumber'] ?? '';
+    $invoice->errorCode       = $info['errorCode'] ?? '';
+    $invoice->errorDetail     = $info['errorDetail'] ?? '';
+    $invoice->taxResult       = 'send';
+
+    $invoice->save();
+}
+```
+
+Note that you need to have a valid Moadian account and credentials to use this plugin.
+
 
 ## Contributing
 
