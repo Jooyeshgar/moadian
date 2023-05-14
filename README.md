@@ -86,6 +86,7 @@ public function sendInvoice($invoiceId = '') {
     $Header->tdis = $discount;
     $Header->tadis = $amount - $discount;
     $Header->tvam = $vat;
+    $Header->todam = 0;
     $Header->tbill = $amount - $discount + $vat;
     $Header->setm = $invoice->setm;
     $Header->cap = $amount - $discount + $vat;
@@ -102,8 +103,8 @@ public function sendInvoice($invoiceId = '') {
         $Body->prdis = $item->amount;
         $Body->dis = $item->discount;
         $Body->adis = $item->amount - $item->discount;
-        $Body->vra = '0.09';
-        $Body->vam = $item->vat;
+        $Body->vra = 9;
+        $Body->vam = $item->vat; // or directly calculate here like floor($Body->adis * $Body->vra / 100)
         $Body->tsstam = $item->amount - $item->discount + $item->vat;
         $moadianInvoice->addItem($Body);
     }
@@ -115,6 +116,10 @@ public function sendInvoice($invoiceId = '') {
             $Payment->pdt = Carbon::parse($cashe->date)->timestamp * 1000;
             $moadianInvoice->addPayment($Payment);
         }
+    }
+
+    if($invoice->referenceNumber) {
+        $moadianInvoice->retry = true;
     }
 
     $info = Moadian::sendInvoice($moadianInvoice);
