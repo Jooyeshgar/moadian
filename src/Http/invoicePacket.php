@@ -15,6 +15,7 @@ class invoicePacket extends Packet
         $this->fiscalId    = $username;
         $this->needToken   = true;
         $this->needEncrypt = true;
-        $this->data = $invoice->toArray();
+        $this->data        = $invoice->toArray();
+        $this->retry       = $invoice->retry;
     }
 }
