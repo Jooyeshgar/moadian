@@ -54,7 +54,7 @@ class Moadian
 
     public function getEconomicCodeInformation(string $taxID)
     {
-        if (strlen($taxID)>9 || strlen($taxID) < 12)
+        if (strlen($taxID) < 9 || strlen($taxID) >= 12)
             throw new MoadianException('$taxID must be between 10 and 11 digits');
 
         return $this->client->getEconomicCodeInformation($taxID);
