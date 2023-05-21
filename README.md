@@ -64,57 +64,57 @@ public function sendInvoice($invoiceId = '') {
 
     $timestamp = Carbon::parse($invoice->date)->timestamp * 1000;
 
-    $Header = new InvoiceHeader(env('MOADIAN_USERNAME'));
-    $Header->setTaxID(Carbon::parse($invoice->date), $invoice->number);
-    $Header->indati2m = $timestamp;
-    $Header->indatim = $timestamp;
-    $Header->inty = 1; //invoice type
-    $Header->inno = $invoiceId;
-    $Header->irtaxid = null; // invoice reference tax ID
-    $Header->inp = $invoice->inp; //invoice pattern
-    $Header->ins = 1;
-    $Header->tins = env('TAXID');
-    $Header->tob = 2;
-    $Header->bid = $invoice->nationalnum;
-    $Header->tinb = $invoice->nationalnum;
-    $Header->bpc = $invoice->postal;
+    $header = new InvoiceHeader(env('MOADIAN_USERNAME'));
+    $header->setTaxID(Carbon::parse($invoice->date), $invoice->number);
+    $header->indati2m = $timestamp;
+    $header->indatim = $timestamp;
+    $header->inty = 1; //invoice type
+    $header->inno = $invoiceId;
+    $header->irtaxid = null; // invoice reference tax ID
+    $header->inp = $invoice->inp; //invoice pattern
+    $header->ins = 1;
+    $header->tins = env('TAXID');
+    $header->tob = 2;
+    $header->bid = $invoice->nationalnum;
+    $header->tinb = $invoice->nationalnum;
+    $header->bpc = $invoice->postal;
 
     $amount   = $invoice->items->sum('amount');
     $discount = $invoice->items->sum('discount');
     $vat      = $invoice->items->sum('vat');
-    $Header->tprdis = $amount;
-    $Header->tdis = $discount;
-    $Header->tadis = $amount - $discount;
-    $Header->tvam = $vat;
-    $Header->todam = 0;
-    $Header->tbill = $amount - $discount + $vat;
-    $Header->setm = $invoice->setm;
-    $Header->cap = $amount - $discount + $vat;
+    $header->tprdis = $amount;
+    $header->tdis = $discount;
+    $header->tadis = $amount - $discount;
+    $header->tvam = $vat;
+    $header->todam = 0;
+    $header->tbill = $amount - $discount + $vat;
+    $header->setm = $invoice->setm;
+    $header->cap = $amount - $discount + $vat;
 
-    $moadianInvoice = new MoadianInvoice($Header);
+    $moadianInvoice = new MoadianInvoice($header);
 
     foreach ($invoice->items as $item) {
-        $Body = new InvoiceItem();
-        $Body->sstid = $item->seals->sstid;
-        $Body->sstt = $item->desc;
-        $Body->am = '1';
-        $Body->mu = 1627;
-        $Body->fee = $item->amount;
-        $Body->prdis = $item->amount;
-        $Body->dis = $item->discount;
-        $Body->adis = $item->amount - $item->discount;
-        $Body->vra = 9;
-        $Body->vam = $item->vat; // or directly calculate here like floor($Body->adis * $Body->vra / 100)
-        $Body->tsstam = $item->amount - $item->discount + $item->vat;
-        $moadianInvoice->addItem($Body);
+        $body = new InvoiceItem();
+        $body->sstid = $item->seals->sstid;
+        $body->sstt = $item->desc;
+        $body->am = '1';
+        $body->mu = 1627;
+        $body->fee = $item->amount;
+        $body->prdis = $item->amount;
+        $body->dis = $item->discount;
+        $body->adis = $item->amount - $item->discount;
+        $body->vra = 9;
+        $body->vam = $item->vat; // or directly calculate here like floor($body->adis * $body->vra / 100)
+        $body->tsstam = $item->amount - $item->discount + $item->vat;
+        $moadianInvoice->addItem($body);
     }
 
     foreach ($invoice->cashes as $cashe) {
         if ($cashe->active == 1) {
-            $Payment = new Payment();
-            $Payment->trn = $cashe->code;
-            $Payment->pdt = Carbon::parse($cashe->date)->timestamp * 1000;
-            $moadianInvoice->addPayment($Payment);
+            $payment = new Payment();
+            $payment->trn = $cashe->code;
+            $payment->pdt = Carbon::parse($cashe->date)->timestamp * 1000;
+            $moadianInvoice->addPayment($payment);
         }
     }
 
@@ -126,7 +126,7 @@ public function sendInvoice($invoiceId = '') {
     $info = $info->getBody();
     $info = $info[0];
 
-    $invoice->taxID           = $Header->taxid;
+    $invoice->taxID           = $header->taxid;
     $invoice->uid             = $info['uid'] ?? '';
     $invoice->referenceNumber = $info['referenceNumber'] ?? '';
     $invoice->errorCode       = $info['errorCode'] ?? '';

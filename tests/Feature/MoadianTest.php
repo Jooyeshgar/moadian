@@ -36,7 +36,7 @@ class MoadianTest extends TestCase
     public function testGetServerInformation()
     {
         $key = file_get_contents(__DIR__.'/private.pem');
-        $moadian = new Moadian('A11YO5', $key, 'https://Sandboxrc.tax.gov.ir/');
+        $moadian = new Moadian('A11xxx', $key, 'https://Sandboxrc.tax.gov.ir/');
     
         $serverInfo = $moadian->getServerInfo();
     
@@ -55,7 +55,7 @@ class MoadianTest extends TestCase
     public function testGetToken()
     {
         $key = file_get_contents(__DIR__.'/private.pem');
-        $moadian = new Moadian('A11YO5', $key);
+        $moadian = new Moadian('A11xxx', $key);
 
         $res = $moadian->getToken();
 
@@ -65,7 +65,7 @@ class MoadianTest extends TestCase
     public function testInquiryByUid()
     {
         $key = file_get_contents(__DIR__ . '/private.pem');
-        $moadian = new Moadian('A11YO5', $key);
+        $moadian = new Moadian('A11xxx', $key);
 
         $res = $moadian->inquiryByUid([
             Uuid::uuid4()->toString(),
@@ -79,7 +79,7 @@ class MoadianTest extends TestCase
     public function testInquiryByReferenceNumber()
     {
         $key = file_get_contents(__DIR__ . '/private.pem');
-        $moadian = new Moadian('A11YO5', $key);
+        $moadian = new Moadian('A11xxx', $key);
 
         $res = $moadian->inquiryByReferenceNumbers([
             Uuid::uuid4()->toString(),
@@ -93,7 +93,7 @@ class MoadianTest extends TestCase
     public function testGetFiscalInformation()
     {
         $key = file_get_contents(__DIR__ . '/private.pem');
-        $moadian = new Moadian('A11YO5', $key);
+        $moadian = new Moadian('A11xxx', $key);
 
         $res = $moadian->getFiscalInfo();
 
