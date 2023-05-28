@@ -25,7 +25,7 @@ class InvoiceHeader
     /**
      * invoice creation timestamp (milliseconds from epoch)
      */
-    public int $indati2m;
+    public ?int $indati2m;
 
     /**
      * invoice type
@@ -35,7 +35,7 @@ class InvoiceHeader
     /**
      * internal invoice number
      */
-    public ?string $inno = null;
+    public ?string $inno;
 
     /**
      * invoice reference tax ID
@@ -100,7 +100,7 @@ class InvoiceHeader
     /**
      * seller customs licence number
      */
-    public ?int $scln;
+    public ?string $scln;
 
     /**
      * seller customs code
@@ -110,7 +110,17 @@ class InvoiceHeader
     /**
      * contract registration number
      */
-    public ?int $crn;
+    public ?string $crn;
+
+    /**
+     * customs declaration cottage number
+     */
+    public ?string $cdcn;
+
+    /**
+     * customs declaration cottage date
+     */
+    public ?int $cdcd;
 
     /**
      * billing ID
@@ -120,32 +130,47 @@ class InvoiceHeader
     /**
      * total pre discount
      */
-    public int $tprdis;
+    public ?float $tprdis;
 
     /**
      * total discount
      */
-    public int $tdis;
+    public ?float $tdis;
 
     /**
      * total after discount
      */
-    public int $tadis;
+    public ?float $tadis;
 
     /**
      * total VAT amount
      */
-    public int $tvam;
+    public float $tvam;
 
     /**
      * total other duty amount
      */
-    public int $todam;
+    public ?float $todam;
 
     /**
      * total bill
      */
-    public int $tbill;
+    public float $tbill;
+
+    /**
+     * total net weight
+     */
+    public ?float $tonw;
+
+    /**
+     * total Rial value
+     */
+    public ?float $torv;
+
+    /**
+     * total currency value
+     */
+    public ?float $tocv;
 
     /**
      * settlement type
@@ -155,22 +180,22 @@ class InvoiceHeader
     /**
      * cash payment
      */
-    public ?int $cap;
+    public ?float $cap;
 
     /**
      * installment payment
      */
-    public ?int $insp;
+    public ?float $insp;
 
     /**
      * total VAT of payment
      */
-    public ?string $tvop;
+    public ?float $tvop;
 
     /**
      * tax17
      */
-    public int $tax17;
+    public ?float $tax17;
 
     public function __construct(string $username = null) {
         $this->clientId = $username;
