@@ -4,7 +4,6 @@ namespace Jooyeshgar\Moadian;
 
 class Payment
 {
-    
     /**
      * Iin number
      */
@@ -19,6 +18,11 @@ class Payment
      * terminal number
      */
     public ?string $trmn;
+
+    /**
+     * payment method
+     */
+    public ?int $pmt;
 
     /**
      * tracking number
@@ -39,6 +43,11 @@ class Payment
      * payment DateTime
      */
     public ?int $pdt;
+
+    /**
+     * payment value
+     */
+    public ?float $pv;
 
     public function toArray(): array
     {
