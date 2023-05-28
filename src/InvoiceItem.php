@@ -4,30 +4,35 @@ namespace Jooyeshgar\Moadian;
 
 class InvoiceItem
 {
-     /**
+/**
      * service stuff ID
      */
-    public ?string $sstid;
+    public string $sstid;
 
     /**
      * service stuff title
      */
-    public string $sstt;
+    public ?string $sstt;
 
     /**
      * amount
      */
-    public int $am;
+    public float $am;
 
     /**
      * measurement unit
      */
-    public string $mu;
+    public ?string $mu;
+
+    /**
+     * net weight
+     */
+    public ?float $nw;
 
     /**
      * fee (pure price per item)
      */
-    public int $fee;
+    public float $fee;
 
     /**
      * fee in foreign currency
@@ -42,47 +47,57 @@ class InvoiceItem
     /**
      * exchange rate
      */
-    public ?int $exr;
+    public ?float $exr;
+
+    /**
+     * service stuff Rial Value
+     */
+    public ?float $ssrv;
+
+    /**
+     * service stuff currency value
+     */
+    public ?float $sscv;
 
     /**
      * pre discount
      */
-    public int $prdis;
+    public ?float $prdis;
 
     /**
      * discount
      */
-    public int $dis;
+    public ?float $dis;
 
     /**
      * after discount
      */
-    public int $adis;
+    public ?float $adis;
 
     /**
      * VAT rate
      */
-    public int $vra;
+    public float $vra;
 
     /**
      * VAT amount
      */
-    public int $vam;
+    public float $vam;
 
     /**
-     * over duty title
+     * other duty title
      */
     public ?string $odt;
 
     /**
-     * over duty rate
+     * other duty rate
      */
     public ?float $odr;
 
     /**
-     * over duty amount
+     * other duty amount
      */
-    public ?int $odam;
+    public ?float $odam;
 
     /**
      * other legal title
@@ -97,37 +112,37 @@ class InvoiceItem
     /**
      * other legal amount
      */
-    public ?int $olam;
+    public ?float $olam;
 
     /**
      * construction fee
      */
-    public ?int $consfee;
+    public ?float $consfee;
 
     /**
      * seller profit
      */
-    public ?int $spro;
+    public ?float $spro;
 
     /**
      * broker salary
      */
-    public ?int $bros;
+    public ?float $bros;
 
     /**
      * total construction profit broker salary
      */
-    public ?int $tcpbs;
+    public ?float $tcpbs;
 
     /**
      * cash share of payment
      */
-    public ?int $cop;
+    public ?float $cop;
 
     /**
      * vat of payment
      */
-    public ?string $vop;
+    public ?float $vop;
 
     /**
      * buyer register number
@@ -137,40 +152,7 @@ class InvoiceItem
     /**
      * total service stuff amount
      */
-    public int $tsstam;
-
-    // public function toArray(): array
-    // {
-    //     return [
-    //         'sstid' => $this->sstid,
-    //         'sstt' => $this->sstt,
-    //         'am' => $this->am,
-    //         'mu' => $this->mu,
-    //         'fee' => $this->fee,
-    //         'cfee' => $this->cfee,
-    //         'cut' => $this->cut,
-    //         'exr' => $this->exr,
-    //         'prdis' => $this->prdis,
-    //         'dis' => $this->dis,
-    //         'adis' => $this->adis,
-    //         'vra' => $this->vra,
-    //         'vam' => $this->vam,
-    //         'odt' => $this->odt,
-    //         'odr' => $this->odr,
-    //         'odam' => $this->odam,
-    //         'olt' => $this->olt,
-    //         'olr' => $this->olr,
-    //         'olam' => $this->olam,
-    //         'consfee' => $this->consfee,
-    //         'spro' => $this->spro,
-    //         'bros' => $this->bros,
-    //         'tcpbs' => $this->tcpbs,
-    //         'cop' => $this->cop,
-    //         'vop' => $this->vop,
-    //         'bsrn' => $this->bsrn,
-    //         'tsstam' => $this->tsstam,
-    //     ];
-    // }
+    public float $tsstam;
 
     public function toArray(): array
     {
