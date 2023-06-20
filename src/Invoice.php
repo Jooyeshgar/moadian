@@ -8,6 +8,8 @@ class Invoice
     private array $body = [];
     private array $payments = [];
 
+    public $retry = false;
+    
     public function __construct(InvoiceHeader $header)
     {
         $this->header = $header;
