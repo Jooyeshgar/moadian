@@ -46,8 +46,8 @@ class SignatureService
             if ($value === '' || $value === null) {
                 $value = '#';
             }
-            else {
-                strtr($value, [ '#' => '##']);
+            elseif (str_contains($value, '#')){
+                $value = str_replace('#', '##', $value);
             }
 
             $normalizedData[] = $value;
