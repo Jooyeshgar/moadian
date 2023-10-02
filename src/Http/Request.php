@@ -1,95 +1,40 @@
-<?php 
+<?php
 
 namespace Jooyeshgar\Moadian\Http;
 
-use Ramsey\Uuid\Nonstandard\Uuid;
+use Jooyeshgar\Moadian\Services\EncryptionService;
+use Jooyeshgar\Moadian\Services\SignatureService;
 
-class Request
+abstract class Request
 {
-    // Headers fields
-    public string $authorization;
-    public string $requestTraceId;
-    public string $timestamp = '';
+    public string $path;
+    public string $method = 'get';
 
-    // Body fields
-    private ?Packet  $packet = null; 
-    private array    $packets = [];
-    public  string   $signature;
-    public  ?string  $signatureKeyId = null;
+    protected array $headers;
+    protected array $body;
+    protected array $params;
 
-    public bool $needToken = false;
-
-    public function __construct() 
+    public function __construct()
     {
-        $this->timestamp = (string)intval(microtime(true) * 1000);
-        $this->requestTraceId = Uuid::uuid4()->toString();
-    }
-
-    public function setPacket(Packet $packet)
-    {
-        $this->packet = $packet;
-        $this->needToken = $packet->needToken;
-    }
-
-    public function setPackets(array $packets)
-    {
-        $this->packets = $packets;
-        $this->needToken = $packets[0]->needToken;
-    }
-
-    public function getPacket()
-    {
-        return $this->packet ?? $this->packets[0];
-    }
-
-    public function getPackets()
-    {
-        return $this->packets;
-    }
-
-    public function setToken(string $token)
-    {
-        $this->authorization = $token;
+        $this->headers['accept'] = '*/*';
+        $this->body   = [];
+        $this->params = [];
     }
 
     public function getHeaders()
     {
-        $headers = [
-            'requestTraceId' => $this->requestTraceId,
-            'timestamp' => $this->timestamp
-        ];
-
-        if ($this->needToken) {
-            $headers['authorization'] = 'Bearer ' . $this->authorization;
-        }
-
-        return $headers;
+        return $this->headers;
     }
 
     public function getBody()
-    {  
-        return json_encode($this->toArray());
-    }
-
-    public function toArray()
     {
-        $packetKey   = '';
-        $packetValue = '';
-
-        if (isset($this->packet)) {
-            $packetKey   = 'packet';
-            $packetValue = $this->packet->toArray();
-        } else {
-            $packetKey   = 'packets';
-            $packetValue = [];
-            foreach ($this->packets as $packet) {
-                $packetValue[] = $packet->toArray();
-            }
-        }
-
-        return [
-            $packetKey  => $packetValue,
-            'signature' => $this->signature,
-        ];
+        return $this->body;
     }
+
+    public function getParams()
+    {
+        return $this->params;
+    }
+
+    abstract function prepare(SignatureService $signer, EncryptionService $encryptor);
 }
