@@ -6,16 +6,15 @@ use Jooyeshgar\Moadian\Services\EncryptionService;
 use Jooyeshgar\Moadian\Services\SignatureService;
 use Jooyeshgar\Moadian\Traits\HasToken;
 
-class EconomicCodeInformation extends Request
+class ServerInfo extends Request
 {
     use HasToken;
 
-    public function __construct(string $taxId)
+    public function __construct()
     {
         parent::__construct();
 
-        $this->path = 'taxpayer';
-        $this->params['economicCode'] = $taxId;
+        $this->path = 'server-information';
     }
 
     public function prepare(SignatureService $signer, EncryptionService $encryptor)
