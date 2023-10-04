@@ -24,10 +24,11 @@ class MoadianServiceProvider extends ServiceProvider
             $privateKeyPath = $config['private_key_path'] ?? storage_path('app/keys/private.pem');
             $privateKey = file_get_contents($privateKeyPath);
 
-            return new Moadian(
-                $config['username'],
-                $privateKey
-            );
+            $certificatePath = $config['certificate_path'] ?? storage_path('app/keys/certificate.crt');
+            $certificate = file_get_contents($certificatePath);
+            $certificate = str_replace("\r\n", '', $certificate);
+
+            return new Moadian($privateKey, $certificate);
         });
     }
 
