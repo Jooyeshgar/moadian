@@ -2,19 +2,31 @@
 
 namespace Jooyeshgar\Moadian\Http;
 
-class InquiryByReferenceNumber extends Packet
+use Jooyeshgar\Moadian\Services\EncryptionService;
+use Jooyeshgar\Moadian\Services\SignatureService;
+use Jooyeshgar\Moadian\Traits\HasToken;
+
+class InquiryByReferenceNumber extends Request
 {
-    public function __construct(array $refNums, string $username)
+    use HasToken;
+
+    public function __construct(string $referenceId, string $start = '', string $end = '')
     {
         parent::__construct();
 
-        $this->path       = 'req/api/self-tsp/sync/INQUIRY_BY_REFERENCE_NUMBER';
-        $this->packetType = 'INQUIRY_BY_REFERENCE_NUMBER';
-        $this->fiscalId   = $username;
-        $this->needToken  = true;
+        $this->path = 'inquiry-by-reference-id';
+        $this->params['referenceIds'] = $referenceId;
 
-        $this->data = [
-            'referenceNumber' => $refNums,
-        ];
+        if (!empty($start)) {
+            $this->params['start'] = $start;
+        }
+        if (!empty($end)) {
+            $this->params['end'] = $end;
+        }
+    }
+
+    public function prepare(SignatureService $signer, EncryptionService $encryptor)
+    {
+        $this->addToken($signer);
     }
 }
