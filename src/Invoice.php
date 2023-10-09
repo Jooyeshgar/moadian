@@ -37,8 +37,6 @@ class Invoice
             'payments' => array_map(function ($item){
                 return $item->toArray();
             }, $this->payments),
-
-            'extension' => null,
         ];
     }
 }

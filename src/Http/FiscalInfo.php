@@ -14,7 +14,7 @@ class FiscalInfo extends Request
     {
         parent::__construct();
 
-        $this->path = 'fiscal-info';
+        $this->path = 'fiscal-information';
         $this->params['memoryId'] = config('moadian.username');
     }
 
