@@ -2,70 +2,43 @@
 
 namespace Jooyeshgar\Moadian\Services;
 
-use Jooyeshgar\Moadian\Exceptions\MoadianException;
+use Firebase\JWT\JWT;
 
 class SignatureService
 {
     private string $privateKey;
+    private string $x5c;
 
-    public function __construct(string $privateKey)
+    public function __construct(string $privateKey, string $x5c)
     {
         $this->privateKey = $privateKey;
+        $this->x5c = $x5c;
     }
 
-    public function sign(array $data, array $headers)
+    /**
+     * Converts and signs a PHP array to JWS string
+     */
+    public function sign(array $payload, array $headers = [])
     {
-        $text = $this->normalizer($data, $headers);
-        $signature = '';
-
-        if (openssl_sign($text, $signature, $this->privateKey, OPENSSL_ALGO_SHA256)) {
-            return base64_encode($signature);
-        }
-        else {
-            throw new MoadianException('Failed to sign the text with message ' . openssl_error_string());
-        }
-    }
-
-
-    public static function normalizer(array $data, array $headers): string
-    {
-        $data = $data + $headers;
-
-        $normalizedData = [];
-
-        $flatted = self::flattener($data);
-
-        ksort($flatted);
-
-        foreach ($flatted as $value) {
-
-            if (is_bool($value)) {
-                $value = $value ? 'true' : 'false';
-            }
-
-            if ($value === '' || $value === null) {
-                $value = '#';
-            }
-            elseif (str_contains($value, '#')){
-                $value = str_replace('#', '##', $value);
-            }
-
-            $normalizedData[] = $value;
+        if (empty($headers)) {
+            $headers = [
+                'alg'  => 'RS256',
+                'x5c'  => [$this->x5c],
+                'sigT' => Carbon::now()->toIso8601ZuluString(),
+                'typ'  => 'jose',
+                'crit' => ['sigT'],
+                'cty'  => 'text/plain'
+            ];
         }
 
-        return implode("#", $normalizedData);
-    }
+        $segments = [];
+        $segments[] = JWT::urlsafeB64Encode(JWT::jsonEncode($headers));
+        $segments[] = JWT::urlsafeB64Encode(JWT::jsonEncode($payload));
 
-    private static function flattener(array $array, string $prefix = ''): array {
-        $flatted = [];
-        foreach ($array as $key => $value) {
-            if (is_array($value)) {
-                $flatted = array_merge($flatted, self::flattener($value, "$prefix.$key"));
-            }
-            else {
-                $flatted["$prefix.$key"] = $value;
-            }
-        }
-        return $flatted;
+        $signingInput = implode('.', $segments);
+        $signature    = JWT::sign($signingInput, $this->privateKey, $headers['alg']);
+        $segments[]   = JWT::urlsafeB64Encode($signature);
+
+        return implode('.', $segments);
     }
 }
