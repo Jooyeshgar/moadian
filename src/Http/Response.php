@@ -63,20 +63,6 @@ class Response
             ];
         }
 
-        //sync response
-        if(isset($data['result']['data'])){
-            return $data['result']['data'];
-        }
-        
-        //async response
-        if(isset($data['result'][0]['referenceNumber'])) {
-            return $data['result'];
-        }
-
-        $this->error = 'Response does not contain a "result.data" field';
-        return [
-            'error' => $this->error,
-            'raw' => $data,
-        ];
+        return $data;
     }
 }
