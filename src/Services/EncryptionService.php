@@ -2,7 +2,7 @@
 
 namespace Jooyeshgar\Moadian\Services;
 
-use Jooyeshgar\Moadian\Exceptions\MoadianException;
+use Firebase\JWT\JWT;
 use phpseclib3\Crypt\RSA;
 
 class EncryptionService
@@ -28,43 +28,40 @@ class EncryptionService
     {
         $rsa = RSA::loadPublicKey($this->publicKey);
 
-        return base64_encode($rsa->encrypt($aesKey));
+        return $rsa->encrypt($aesKey);
     }
 
     /**
-     * Encrypts the given text using the provided key and initialization vector (IV).
+     * Encrypts the given invoice.
      * 
-     * @param string $text The plaintext to be encrypted.
+     * @param string $jws Signed invoice.
      * @param string $key The encryption key used for encryption in binary format.
      * @param string $iv The initialization vector (IV) used for encryption in binary format.
-     * @return string The base64-encoded encrypted ciphertext with authentication tag appended.
+     * @return string Encrypted invoice packet.
      */
-    public function encrypt(string $text, string $key, string $iv): string
+    public function encrypt(string $jws, string $key, string $iv): string
     {
-        $text = $this->xorStrings($text, $key);
+        $segments = [];
+        $header = [
+            'alg' => 'RSA-OAEP-256',
+            'enc' => 'A256GCM',
+            'kid' => $this->KeyId
+        ];
+
+        $segments[] = JWT::urlsafeB64Encode(JWT::jsonEncode($header));
+        $segments[] = JWT::urlsafeB64Encode($this->encryptAesKey($key));
+        $segments[] = JWT::urlsafeB64Encode($iv);
+
+        // Additional authenticated data
+        $ascii = array_values(unpack('C*', $segments[0]));
+        $aad = implode(array_map('chr', $ascii));
 
         $tag = '';
+        $payload = openssl_encrypt($jws, self::CIPHER, $key, OPENSSL_RAW_DATA, $iv, $tag, $aad, self::TAG_LENGTH);
 
-        $cipherText = openssl_encrypt($text, self::CIPHER, $key, OPENSSL_RAW_DATA, $iv, $tag, "", self::TAG_LENGTH);
+        $segments[] = JWT::urlsafeB64Encode($payload);
+        $segments[] = JWT::urlsafeB64Encode($tag);
 
-        // Return the base64-encoded encrypted ciphertext with the authentication tag appended
-        return base64_encode($cipherText . $tag);
+        return implode('.', $segments);
     }
-
-    public function decrypt(string $encryptedText, string $key, string $iv, int $tagLen)
-    {
-
-    }
-
-    public function xorStrings(string $source, string $key): string
-    {
-        $sourceLength = strlen($source);
-        $keyLength = strlen($key);
-        $result = '';
-        for ($i = 0; $i < $sourceLength; $i++) {
-            $result .= $source[$i] ^ $key[$i % $keyLength];
-        }
-        return $result;
-    }
-
 }
