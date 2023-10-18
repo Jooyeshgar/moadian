@@ -2,6 +2,7 @@
 
 namespace Jooyeshgar\Moadian\Services;
 
+use Carbon\Carbon;
 use Firebase\JWT\JWT;
 
 class SignatureService

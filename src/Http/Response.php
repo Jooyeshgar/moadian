@@ -21,7 +21,7 @@ class Response
         }
 
         return $this;
-    }   
+    }
 
     public function getStatusCode()
     {
@@ -58,8 +58,8 @@ class Response
 
         if (!$this->isSuccessful()) {
             return [
-                'error' => $data['errors'][0]['errorDetail'],
-                'errorCode' => $data['errors'][0]['errorCode']
+                'error' => $data['errors'][0]['message'],
+                'errorCode' => $data['errors'][0]['code']
             ];
         }
 
