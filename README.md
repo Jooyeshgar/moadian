@@ -1,4 +1,4 @@
-# Laravel Moadian API Driver
+# Laravel Moadian API Driver (version 2)
 
 This Laravel package provides a convenient way to interact with the API of the "Moadian system" (سامانه مودیان) offered by intamedia.ir. With this package, you can easily make requests to the Moadian API and handle the responses in your Laravel application.
 
@@ -14,14 +14,15 @@ composer require jooyeshgar/moadian
 ```
 ## Usage
 
-To use this package, you will need to obtain a username and private key from intamedia.ir. Once you have your credentials, you can configure the package in your Laravel application's `.env` file:
+To use this package, you will need to obtain a username, private key and certificate from intamedia.ir. Once you have your credentials, you can configure the package in your Laravel application's `.env` file:
 
 ```
 MOADIAN_USERNAME=your-username-here
 MOADIAN_PRIVATE_KEY_PATH=/path/to/private.key
+MOADIAN_CERTIFICATE_PATH=/path/to/certificate.crt
 ```
-The default location to store the private key is:
-storage_path('app/keys/private.pem');
+The default location to store the private key is: storage_path('app/keys/private.pem');\
+The default location to store the certificate is: storage_path('app/keys/certificate.crt');
 
 You can then use the `Moadian` facade to interact with the Moadian API. Here are some examples:
 
@@ -31,9 +32,6 @@ use Jooyeshgar\Moadian\Facades\Moadian;
 // Get server info
 $info = Moadian::getServerInfo();
 
-// Get token
-$info = Moadian::getToken();
-
 // Get fiscal info
 $fiscalInfo = Moadian::getFiscalInfo();
 
@@ -41,7 +39,7 @@ $fiscalInfo = Moadian::getFiscalInfo();
 $info = Moadian::getEconomicCodeInformation('10840096498');
 
 // Inquiry by reference numbers
-$info = Moadian::inquiryByReferenceNumbers(["a45aa663-6888-4025-a89d-86fc789672a0"]);
+$info = Moadian::inquiryByReferenceNumbers('a45aa663-6888-4025-a89d-86fc789672a0');
 ```
 
 ### Send Invoice
@@ -118,19 +116,13 @@ public function sendInvoice($invoiceId = '') {
         }
     }
 
-    if($invoice->referenceNumber) {
-        $moadianInvoice->retry = true;
-    }
-
     $info = Moadian::sendInvoice($moadianInvoice);
     $info = $info->getBody();
-    $info = $info[0];
+    $info = $info['result'][0];
 
     $invoice->taxID           = $header->taxid;
     $invoice->uid             = $info['uid'] ?? '';
     $invoice->referenceNumber = $info['referenceNumber'] ?? '';
-    $invoice->errorCode       = $info['errorCode'] ?? '';
-    $invoice->errorDetail     = $info['errorDetail'] ?? '';
     $invoice->taxResult       = 'send';
 
     $invoice->save();
@@ -139,6 +131,7 @@ public function sendInvoice($invoiceId = '') {
 
 Note that you need to have a valid Moadian account and credentials to use this plugin.
 
+There are other types of invoices (Cancellation, corrective, Sales return) that you can send with this package. For more information about different types of invoices and how to send them, please refer to the official document.
 
 ## Contributing
 
