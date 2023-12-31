@@ -28,7 +28,9 @@ class MoadianServiceProvider extends ServiceProvider
             $certificate = file_get_contents($certificatePath);
             $certificate = str_replace("\r\n", '', $certificate);
 
-            return new Moadian($privateKey, $certificate);
+            $baseUri = $config['base_uri'] ?? 'https://tp.tax.gov.ir/requestsmanager/api/v2/';
+
+            return new Moadian($privateKey, $certificate, $baseUri);
         });
     }
 
