@@ -1,6 +1,12 @@
-# Laravel Moadian API Driver (version 2)
+# Laravel Moadian API Driver (API Only)
 
 This Laravel package provides a convenient way to interact with the API of the "Moadian system" (سامانه مودیان) offered by intamedia.ir. With this package, you can easily make requests to the Moadian API and handle the responses in your Laravel application.
+
+**Important Notice:** This package provides access to the Moadian system API and is not intended for direct user interaction. It's designed for developers integrating Moadian functionality into their applications.
+
+For a user-friendly accounting software experience, we recommend checking out our FreeAmin project (under **development**):
+
+ * Link: https://github.com/Jooyeshgar/FreeAmir
 
 ## Requirements
 
@@ -18,7 +24,7 @@ To use this package, you will need to obtain a username, private key and certifi
 
 ```
 MOADIAN_USERNAME=your-username-here
-MOADIAN_PRIVATE_KEY_PATH=/path/to/private.key
+MOADIAN_PRIVATE_KEY_PATH=/path/to/private.pem
 MOADIAN_CERTIFICATE_PATH=/path/to/certificate.crt
 ```
 The default location to store the private key is: storage_path('app/keys/private.pem');\
