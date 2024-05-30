@@ -139,6 +139,11 @@ Note that you need to have a valid Moadian account and credentials to use this p
 
 There are other types of invoices (Cancellation, corrective, Sales return) that you can send with this package. For more information about different types of invoices and how to send them, please refer to the official document.
 
+## Useful Links
+
+  * [The regulation of store terminals](https://www.intamedia.ir/The-regulation-of-store-terminals)
+  * [Guide to extract public key from digital signature](https://www.intamedia.ir/The-regulation-of-store-terminals/ID/15879/%D8%B1%D8%A7%D9%87%D9%86%D9%85%D8%A7%DB%8C-%D8%A7%D8%B3%D8%AA%D8%AE%D8%B1%D8%A7%D8%AC-%DA%A9%D9%84%DB%8C%D8%AF-%D8%B9%D9%85%D9%88%D9%85%DB%8C-%D8%A7%D8%B2-%D8%A7%D9%85%D8%B6%D8%A7%DB%8C-%D8%AF%DB%8C%D8%AC%DB%8C%D8%AA%D8%A7%D9%84%D9%85%D9%87%D8%B1%D8%B3%D8%A7%D8%B2%D9%85%D8%A7%D9%86%DB%8C-%D9%88-%D8%A8%D8%A7%D8%B1%DA%AF%D8%B0%D8%A7%D8%B1%DB%8C-%D8%A2%D9%86-%D8%AF%D8%B1-%DA%A9%D8%A7%D8%B1%D9%BE%D9%88%D8%B4%D9%87-%D8%B3%D8%A7%D9%85%D8%A7%D9%86%D9%87-%D9%85%D9%88%D8%AF%DB%8C%D8%A7%D9%86)
+
 ## Contributing
 
 If you find a bug or would like to contribute to this package, please feel free to [submit an issue](https://github.com/Jooyeshgar/moadian/issues) or [create a pull request](https://github.com/Jooyeshgar/moadian/pulls).
