@@ -27,6 +27,7 @@ class Moadian
         $this->client = new Client([
             'base_uri' => $baseUri,
             'headers'  => ['Content-Type' => 'application/json'],
+            'timeout'  => 60
         ]);
         $this->signer = new SignatureService($privateKey, $certificate);
         $this->encryptor = new EncryptionService();
@@ -43,8 +44,9 @@ class Moadian
     {
         $request->prepare($this->signer, $this->encryptor);
 
+        $body = !empty($request->getBody()) ? json_encode($request->getBody()) : null;
         $httpResp = $this->client->request($request->method, $request->path, [
-            'body'    => json_encode($request->getBody()),
+            'body'    => $body,
             'headers' => $request->getHeaders(),
             'query'   => $request->getParams()
         ]);
