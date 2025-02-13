@@ -108,9 +108,9 @@ class Moadian
 
     public function getEconomicCodeInformation(string $taxID)
     {
-        if (strlen($taxID) < 9 || strlen($taxID) >= 12)
-            throw new MoadianException('$taxID must be between 10 and 11 digits');
-
+        if (!preg_match('/^(\d{11}|\d{14})$/', $taxID))
+            throw new MoadianException('Economic code must be 11 digits for legal entities or 14 digits for natural persons');
+            
         $request = new EconomicCodeInformation($taxID);
         return $this->sendRequest($request);
     }
