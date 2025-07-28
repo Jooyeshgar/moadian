@@ -197,6 +197,91 @@ class InvoiceHeader
      */
     public ?float $tax17;
 
+    /**
+     * Tax Identification Number of the Company
+     */
+    public ?string $tinc;
+
+    /**
+     * Lading Number
+     */
+    public ?string $lno;
+
+    /**
+     * Lading Reference Number
+     */
+    public ?string $lrno;
+
+    /**
+     * Origin Country
+     */
+    public ?string $ocu;
+
+    /**
+     * Origin City
+     */
+    public ?string $oci;
+
+    /**
+     * Destination Country
+     */
+    public ?string $dco;
+
+    /**
+     * Destination City
+     */
+    public ?string $dci;
+
+    /**
+     * Transporter ID
+     */
+    public ?string $tid;
+
+    /**
+     * Receiver ID
+     */
+    public ?string $rid;
+
+    /**
+     * Lading Type
+     */
+    public ?string $lt;
+
+    /**
+     * Container Number
+     */
+    public ?string $cno;
+
+    /**
+     * Driver's national ID / foreign nationals' unique code in road transportation
+     */
+    public ?string $did;
+
+    /**
+     * Shipped Goods
+     */
+    public ?array $sg=[];
+
+    /**
+     * Announcement Sale Number
+     */
+    public ?string $asn;
+
+    /**
+     * Announcement Sale Date (5 digits)
+     */
+    public ?int $asd;
+
+    /**
+     * Insurance Number
+     */
+    public ?string $in;
+
+    /**
+     * Appendix Number
+     */
+    public ?string $an;
+
     public function __construct(string $username = null) {
         $this->clientId = $username;
     }
@@ -250,5 +335,15 @@ class InvoiceHeader
         }
     
         return $result;
+    }
+
+    /**
+     * Add Shipped Goods Item
+     */
+    public function addSgItem(string $sgid,string $sgt): void {
+        $this->sg[] = [
+            'sgid' => $sgid,
+            'sgt' => $sgt,
+        ];
     }
 }
