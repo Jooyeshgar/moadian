@@ -154,6 +154,22 @@ class InvoiceItem
      */
     public float $tsstam;
 
+    /**
+     * Carat Unit Indicator
+     */
+    public ?float $cui;
+
+    /**
+     * Currency Purchase Rate
+     */
+    public ?float $cpr;
+    
+     /**
+     * Source Of Value Added Tax
+     */
+    public ?float $sovat;
+
+
     public function toArray(): array
     {
         return get_object_vars($this);
