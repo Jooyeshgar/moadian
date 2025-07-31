@@ -293,6 +293,19 @@ class InvoiceHeader
         return $arr;
     }
 
+    /**
+     * set data from array
+     */
+    public function setData(array $data): void {
+        $vars = get_class_vars(get_class($this));
+        $excludedMap = ['taxid'];
+        foreach ($data as $key => $value) {
+            if (isset($vars[$key]) && !in_array($key, $excludedMap)) {
+                $this->$key = $value;
+            }
+        }
+    }
+
     public function setTaxID(DateTime $date, int $internalInvoiceId)
     {
         $daysPastEpoch = $this->getDaysPastEpoch($date);
