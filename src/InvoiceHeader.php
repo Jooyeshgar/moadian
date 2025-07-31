@@ -282,7 +282,7 @@ class InvoiceHeader
      */
     public ?string $an;
 
-    public function __construct(string $username = null) {
+    public function __construct(?string $username = null) {
         $this->clientId = $username;
     }
 
