@@ -60,6 +60,6 @@ class Payment
 
     public function toArray(): array
     {
-        return get_object_vars($this);
+        return get_public_object_vars($this);
     }
 }

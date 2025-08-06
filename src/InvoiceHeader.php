@@ -297,7 +297,7 @@ class InvoiceHeader
 
     public function toArray(): array
     {
-        $arr = get_object_vars($this);
+        $arr = get_public_object_vars($this);
         unset($arr['clientId']);
         return $arr;
     }
