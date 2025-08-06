@@ -4,9 +4,18 @@ namespace Jooyeshgar\Moadian;
 
 use DateTime;
 use Jooyeshgar\Moadian\Services\VerhoeffService;
+use Jooyeshgar\Moadian\Traits\SetFromArray;
 
 class InvoiceHeader
 {
+    use SetFromArray;
+
+
+    /**
+     * Property that MUST exclude in setData
+     */
+    private array $excludedMap = ['clientId', 'taxid'];
+
     /**
      * MOADIAN_USERNAME
      */
@@ -260,7 +269,7 @@ class InvoiceHeader
     /**
      * Shipped Goods
      */
-    public ?array $sg=[];
+    public ?array $sg = [];
 
     /**
      * Announcement Sale Number
@@ -282,7 +291,8 @@ class InvoiceHeader
      */
     public ?string $an;
 
-    public function __construct(?string $username = null) {
+    public function __construct(?string $username = null)
+    {
         $this->clientId = $username;
     }
 
@@ -291,19 +301,6 @@ class InvoiceHeader
         $arr = get_object_vars($this);
         unset($arr['clientId']);
         return $arr;
-    }
-
-    /**
-     * set data from array
-     */
-    public function setData(array $data): void {
-        $vars = get_class_vars(get_class($this));
-        $excludedMap = ['taxid'];
-        foreach ($data as $key => $value) {
-            if (isset($vars[$key]) && !in_array($key, $excludedMap)) {
-                $this->$key = $value;
-            }
-        }
     }
 
     public function setTaxID(DateTime $date, int $internalInvoiceId)
@@ -331,13 +328,13 @@ class InvoiceHeader
 
     private function clientIdToNumber(string $clientId): string
     {
-        if(!defined('CHARACTER_TO_NUMBER_CODING'))
+        if (!defined('CHARACTER_TO_NUMBER_CODING'))
             define('CHARACTER_TO_NUMBER_CODING', [
                 'A' => 65, 'B' => 66, 'C' => 67, 'D' => 68, 'E' => 69, 'F' => 70, 'G' => 71, 'H' => 72, 'I' => 73,
                 'J' => 74, 'K' => 75, 'L' => 76, 'M' => 77, 'N' => 78, 'O' => 79, 'P' => 80, 'Q' => 81, 'R' => 82,
                 'S' => 83, 'T' => 84, 'U' => 85, 'V' => 86, 'W' => 87, 'X' => 88, 'Y' => 89, 'Z' => 90,
             ]);
-    
+
         $result = '';
         foreach (str_split($clientId) as $char) {
             if (is_numeric($char)) {
@@ -346,14 +343,15 @@ class InvoiceHeader
                 $result .= CHARACTER_TO_NUMBER_CODING[$char];
             }
         }
-    
+
         return $result;
     }
 
     /**
      * Add Shipped Goods Item
      */
-    public function addSgItem(string $sgid,string $sgt): void {
+    public function addSgItem(string $sgid, string $sgt): void
+    {
         $this->sg[] = [
             'sgid' => $sgid,
             'sgt' => $sgt,

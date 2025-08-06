@@ -2,8 +2,18 @@
 
 namespace Jooyeshgar\Moadian;
 
+use Jooyeshgar\Moadian\Traits\SetFromArray;
+
+
 class InvoiceItem
 {
+    use SetFromArray;
+
+    /**
+     * Property that MUST exclude in setData
+     */
+    private array $excludedMap = [];
+
     /**
      * service stuff ID
      */
