@@ -44,5 +44,9 @@ class MoadianServiceProvider extends ServiceProvider
         $this->publishes([
             __DIR__.'/config/moadian.php' => config_path('moadian.php'),
         ], 'config');
+
+        if (file_exists(__DIR__.'/helpers.php')) {
+            require_once __DIR__.'/helpers.php';
+        }
     }
 }

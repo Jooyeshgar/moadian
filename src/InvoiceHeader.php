@@ -10,7 +10,6 @@ class InvoiceHeader
 {
     use SetFromArray;
 
-
     /**
      * Property that MUST exclude in setData
      */
