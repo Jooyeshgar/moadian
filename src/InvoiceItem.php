@@ -184,18 +184,4 @@ class InvoiceItem
     {
         return get_object_vars($this);
     }
-
-    /**
-     * set data from array
-     */
-    public function setData(array $data): void
-    {
-        $vars = get_class_vars(get_class($this));
-        $excludedMap = [];
-        foreach ($data as $key => $value) {
-            if (isset($vars[$key]) && !in_array($key, $excludedMap)) {
-                $this->$key = $value;
-            }
-        }
-    }
 }
