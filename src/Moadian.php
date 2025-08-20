@@ -8,6 +8,7 @@ use Jooyeshgar\Moadian\Http\FiscalInfo;
 use Jooyeshgar\Moadian\Http\GetNonce;
 use Jooyeshgar\Moadian\Http\InquiryByReferenceNumber;
 use Jooyeshgar\Moadian\Http\InquiryByUid;
+use Jooyeshgar\Moadian\Http\InquiryInvoiceStatus;
 use Jooyeshgar\Moadian\Http\Request;
 use Jooyeshgar\Moadian\Http\Response;
 use Jooyeshgar\Moadian\Http\SendInvoice;
@@ -103,6 +104,17 @@ class Moadian
     public function inquiryByReferenceNumbers(string $referenceId, string $start = '', string $end = '')
     {
         $request = new InquiryByReferenceNumber($referenceId, $start, $end);
+        return $this->sendRequest($request);
+    }
+
+    /**
+     * Inquiry invoice status with Taxids.
+     *
+     * @param string $taxids
+     */
+    public function inquiryInvoiceStatus(string $taxids)
+    {
+        $request = new InquiryInvoiceStatus($taxids);
         return $this->sendRequest($request);
     }
 

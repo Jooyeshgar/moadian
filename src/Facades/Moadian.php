@@ -7,6 +7,7 @@ namespace Jooyeshgar\Moadian\Facades;
  * @method static Jooyeshgar\Moadian\Http\Response getServerInfo()
  * @method static Jooyeshgar\Moadian\Http\Response getFiscalInfo()
  * @method static Jooyeshgar\Moadian\Http\Response inquiryByUid(string $uid, string $start = '', string $end = '')
+ * @method static Jooyeshgar\Moadian\Http\Response inquiryInvoiceStatus(string $taxids)
  * @method static Jooyeshgar\Moadian\Http\Response inquiryByReferenceNumbers(string $referenceId, string $start = '', string $end = '')
  * @method static Jooyeshgar\Moadian\Http\Response getEconomicCodeInformation(string $taxID)
  * @method static Jooyeshgar\Moadian\Http\Response sendInvoice(Invoice $invoice)
