@@ -15,11 +15,11 @@ class FiscalInfo extends Request
         parent::__construct();
 
         $this->path = 'fiscal-information';
-        $this->params['memoryId'] = config('moadian.username');
     }
 
     public function prepare(SignatureService $signer, EncryptionService $encryptor)
     {
+        $this->params['memoryId'] = $this->username;
         $this->addToken($signer);
     }
 }

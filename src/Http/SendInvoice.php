@@ -6,7 +6,7 @@ use Jooyeshgar\Moadian\Invoice;
 use Jooyeshgar\Moadian\Services\EncryptionService;
 use Jooyeshgar\Moadian\Services\SignatureService;
 use Jooyeshgar\Moadian\Traits\HasToken;
-use Ramsey\Uuid\Nonstandard\Uuid;
+use Ramsey\Uuid\Uuid;
 
 class SendInvoice extends Request
 {
@@ -14,7 +14,8 @@ class SendInvoice extends Request
 
     private Invoice $invoice;
 
-    public function __construct(Invoice $invoice) {
+    public function __construct(Invoice $invoice)
+    {
 
         parent::__construct();
 
@@ -28,7 +29,7 @@ class SendInvoice extends Request
     {
         $this->addToken($signer);
         $jws = $signer->sign($this->invoice->toArray());
-        
+
         $aesHex = bin2hex(random_bytes(32));
         $iv     = bin2hex(random_bytes(12));
 
@@ -38,7 +39,7 @@ class SendInvoice extends Request
             'payload' => $jwe,
             'header'  => [
                 'requestTraceId' => Uuid::uuid4()->toString(),
-                'fiscalId' => config('moadian.username')
+                'fiscalId' => $this->username
             ]
         ];
     }

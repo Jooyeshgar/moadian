@@ -22,9 +22,11 @@ class Moadian
     private SignatureService $signer;
     private EncryptionService $encryptor;
     private Response $response;
+    private string $username;
 
-    public function __construct($privateKey, $certificate, $baseUri ='https://tp.tax.gov.ir/requestsmanager/api/v2/')
+    public function __construct($privateKey, $certificate, $username, $baseUri ='https://tp.tax.gov.ir/requestsmanager/api/v2/')
     {
+        $this->username = $username;
         $this->client = new Client([
             'base_uri' => $baseUri,
             'headers'  => ['Content-Type' => 'application/json'],
@@ -43,6 +45,12 @@ class Moadian
      */
     public function sendRequest(Request $request)
     {
+        // Set credentials for requests that use HasToken trait
+        if (method_exists($request, 'setCredentials')) {
+            $nonce = $this->getNonce();
+            $request->setCredentials($this->username, $nonce);
+        }
+        
         $request->prepare($this->signer, $this->encryptor);
 
         $body = !empty($request->getBody()) ? json_encode($request->getBody()) : null;
