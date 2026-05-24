@@ -253,7 +253,7 @@ class InvoiceHeader
     /**
      * Lading Type
      */
-    public ?string $lt;
+    public ?int $lt;
 
     /**
      * Container Number
