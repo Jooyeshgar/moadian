@@ -24,7 +24,10 @@
         "psr-4": {
             "Jooyeshgar\\Moadian\\": "src/",
             "Jooyeshgar\\Moadian\\Tests\\": "tests/"
-        }
+        },
+        "files": [
+            "src/helpers.php"
+        ]
     },
     "require-dev": {
         "phpunit/phpunit": "^9.0 || ^10.0",

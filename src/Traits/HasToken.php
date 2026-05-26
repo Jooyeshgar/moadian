@@ -7,6 +7,21 @@ use Jooyeshgar\Moadian\Services\SignatureService;
 
 trait HasToken
 {
+    protected string $username;
+    protected string $nonce;
+
+    /**
+     * Set credentials for token generation
+     * 
+     * @param string $username
+     * @param string $nonce
+     */
+    public function setCredentials(string $username, string $nonce): void
+    {
+        $this->username = $username;
+        $this->nonce = $nonce;
+    }
+
     /**
      * Create authorization token
      * 
@@ -16,8 +31,8 @@ trait HasToken
     public function addToken(SignatureService $signer)
     {
         $payload = [
-            'nonce'    => Moadian::getNonce(),
-            'clientId' => config('moadian.username')
+            'nonce'    => $this->nonce,
+            'clientId' => $this->username
         ];
 
         $token = $signer->sign($payload);

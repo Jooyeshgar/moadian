@@ -1,4 +1,5 @@
 <?php
+
 namespace Jooyeshgar\Moadian;
 
 use GuzzleHttp\Client;
@@ -8,6 +9,7 @@ use Jooyeshgar\Moadian\Http\FiscalInfo;
 use Jooyeshgar\Moadian\Http\GetNonce;
 use Jooyeshgar\Moadian\Http\InquiryByReferenceNumber;
 use Jooyeshgar\Moadian\Http\InquiryByUid;
+use Jooyeshgar\Moadian\Http\InquiryInvoiceStatus;
 use Jooyeshgar\Moadian\Http\Request;
 use Jooyeshgar\Moadian\Http\Response;
 use Jooyeshgar\Moadian\Http\SendInvoice;
@@ -21,9 +23,11 @@ class Moadian
     private SignatureService $signer;
     private EncryptionService $encryptor;
     private Response $response;
+    private string $username;
 
-    public function __construct($privateKey, $certificate, $baseUri ='https://tp.tax.gov.ir/requestsmanager/api/v2/')
+    public function __construct($privateKey, $certificate, $username, $baseUri = 'https://tp.tax.gov.ir/requestsmanager/api/v2/')
     {
+        $this->username = $username;
         $this->client = new Client([
             'base_uri' => $baseUri,
             'headers'  => ['Content-Type' => 'application/json'],
@@ -42,6 +46,12 @@ class Moadian
      */
     public function sendRequest(Request $request)
     {
+        // Set credentials for requests that use HasToken trait
+        if (method_exists($request, 'setCredentials')) {
+            $nonce = $this->getNonce();
+            $request->setCredentials($this->username, $nonce);
+        }
+
         $request->prepare($this->signer, $this->encryptor);
 
         $body = !empty($request->getBody()) ? json_encode($request->getBody()) : null;
@@ -60,9 +70,9 @@ class Moadian
 
         $response = $this->sendRequest($request);
 
-        if($response->isSuccessful()){
+        if ($response->isSuccessful()) {
             $result = $response->getBody();
-            return $result['nonce']; 
+            return $result['nonce'];
         }
 
         throw new MoadianException('Unable to retrieve Token');
@@ -106,11 +116,22 @@ class Moadian
         return $this->sendRequest($request);
     }
 
+    /**
+     * Inquiry invoice status with Taxids.
+     *
+     * @param string $taxIds
+     */
+    public function inquiryInvoiceStatus(string $taxIds)
+    {
+        $request = new InquiryInvoiceStatus($taxIds);
+        return $this->sendRequest($request);
+    }
+
     public function getEconomicCodeInformation(string $taxID)
     {
         if (!preg_match('/^(\d{11}|\d{14})$/', $taxID))
             throw new MoadianException('Economic code must be 11 digits for legal entities or 14 digits for natural persons');
-            
+
         $request = new EconomicCodeInformation($taxID);
         return $this->sendRequest($request);
     }

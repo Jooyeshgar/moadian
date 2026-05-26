@@ -15,7 +15,6 @@ class InquiryByUid extends Request
 
         $this->path = 'inquiry-by-uid';
         $this->params['uidList'] = $uid;
-        $this->params['fiscalId'] = config('moadian.username');
 
         if (!empty($start)) {
             $this->params['start'] = $start;
@@ -28,6 +27,7 @@ class InquiryByUid extends Request
 
     public function prepare(SignatureService $signer, EncryptionService $encryptor)
     {
+        $this->params['fiscalId'] = $this->username;
         $this->addToken($signer);
     }
 }

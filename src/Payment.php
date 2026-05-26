@@ -2,8 +2,17 @@
 
 namespace Jooyeshgar\Moadian;
 
+use Jooyeshgar\Moadian\Traits\SetFromArray;
+
 class Payment
 {
+    use SetFromArray;
+
+    /**
+     * Property that MUST exclude in setData
+     */
+    private array $excludedMap = [];
+
     /**
      * Iin number
      */
@@ -51,6 +60,6 @@ class Payment
 
     public function toArray(): array
     {
-        return get_object_vars($this);
+        return get_public_object_vars($this);
     }
 }

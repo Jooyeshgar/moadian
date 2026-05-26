@@ -17,20 +17,15 @@ class MoadianServiceProvider extends ServiceProvider
             __DIR__.'/config/moadian.php', 'moadian'
         );
 
+        $this->app->singleton('Jooyeshgar\Moadian\MoadianManager', function ($app) {
+            return new MoadianManager($app);
+        });
+
+        $this->app->alias('Jooyeshgar\Moadian\MoadianManager', 'moadian');
+
+        // Keep backward compatibility - bind Moadian to the default account
         $this->app->bind('Jooyeshgar\Moadian\Moadian', function ($app) {
-
-            $config = $app['config']['moadian'];
-
-            $privateKeyPath = $config['private_key_path'] ?? storage_path('app/keys/private.pem');
-            $privateKey = file_get_contents($privateKeyPath);
-
-            $certificatePath = $config['certificate_path'] ?? storage_path('app/keys/certificate.crt');
-            $certificate = file_get_contents($certificatePath);
-            $certificate = str_replace("\r\n", '', $certificate);
-
-            $baseUri = $config['base_uri'] ?? 'https://tp.tax.gov.ir/requestsmanager/api/v2/';
-
-            return new Moadian($privateKey, $certificate, $baseUri);
+            return $app->make('Jooyeshgar\Moadian\MoadianManager')->account();
         });
     }
 

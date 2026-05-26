@@ -6,20 +6,19 @@ use Jooyeshgar\Moadian\Services\EncryptionService;
 use Jooyeshgar\Moadian\Services\SignatureService;
 use Jooyeshgar\Moadian\Traits\HasToken;
 
-class FiscalInfo extends Request
+class InquiryInvoiceStatus extends Request
 {
     use HasToken;
 
-    public function __construct()
-    {
+    public function __construct(string $taxIds) {
         parent::__construct();
 
-        $this->path = 'fiscal-information';
+        $this->path = 'inquiry-invoice-status';
+        $this->params['taxIds'] = $taxIds;
     }
 
     public function prepare(SignatureService $signer, EncryptionService $encryptor)
     {
-        $this->params['memoryId'] = $this->username;
         $this->addToken($signer);
     }
 }

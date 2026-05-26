@@ -2,9 +2,19 @@
 
 namespace Jooyeshgar\Moadian;
 
+use Jooyeshgar\Moadian\Traits\SetFromArray;
+
+
 class InvoiceItem
 {
-/**
+    use SetFromArray;
+
+    /**
+     * Property that MUST exclude in setData
+     */
+    private array $excludedMap = [];
+
+    /**
      * service stuff ID
      */
     public string $sstid;
@@ -154,8 +164,24 @@ class InvoiceItem
      */
     public float $tsstam;
 
+    /**
+     * Carat Unit Indicator
+     */
+    public ?float $cui;
+
+    /**
+     * Currency Purchase Rate
+     */
+    public ?float $cpr;
+
+    /**
+     * Source Of Value Added Tax
+     */
+    public ?float $sovat;
+
+
     public function toArray(): array
     {
-        return get_object_vars($this);
+        return get_public_object_vars($this);
     }
 }
