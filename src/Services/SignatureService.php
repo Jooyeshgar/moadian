@@ -23,23 +23,18 @@ class SignatureService
     {
         if (empty($headers)) {
             $headers = [
-                'alg'  => 'RS256',
                 'x5c'  => [$this->x5c],
                 'sigT' => Carbon::now()->toIso8601ZuluString(),
-                'typ'  => 'jose',
                 'crit' => ['sigT'],
                 'cty'  => 'text/plain'
             ];
         }
 
-        $segments = [];
-        $segments[] = JWT::urlsafeB64Encode(JWT::jsonEncode($headers));
-        $segments[] = JWT::urlsafeB64Encode(JWT::jsonEncode($payload));
-
-        $signingInput = implode('.', $segments);
-        $signature    = JWT::sign($signingInput, $this->privateKey, $headers['alg']);
-        $segments[]   = JWT::urlsafeB64Encode($signature);
-
-        return implode('.', $segments);
+        return JWT::encode(
+            payload: $payload,
+            key: $this->privateKey,
+            alg: 'RS256',
+            head: $headers
+        );
     }
 }
